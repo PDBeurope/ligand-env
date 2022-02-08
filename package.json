@@ -1,0 +1,52 @@
+{
+  "name": "pdb-ligand-env",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "dependencies": {
+    "@types/d3": "^5.16.3",
+    "@types/d3-tip": "^3.5.5",
+    "d3": "^5.16.0",
+    "d3-tip": "^0.9.1",
+    "d3scription": "^1.0.1",
+    "lit-element": "^2.4.0",
+    "typescript": "^4.0.2"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.12.3",
+    "@babel/plugin-transform-runtime": "^7.12.1",
+    "@babel/preset-env": "^7.12.1",
+    "@babel/runtime": "^7.12.1",
+    "@webcomponents/webcomponentsjs": "^2.5.0",
+    "babel-loader": "^8.1.0",
+    "browser-sync": "^2.26.13",
+    "camelcase": "^5.0.0",
+    "clean-webpack-plugin": "^1.0.1",
+    "css-loader": "^2.1.0",
+    "del": "^5.1.0",
+    "eslint": "^4.12.0",
+    "file-loader": "^3.0.1",
+    "gulp": "^4.0.2",
+    "gulp-concat": "^2.6.1",
+    "gulp-header": "^2.0.9",
+    "gulp-minify": "^3.1.0",
+    "live-server": "^1.2.1",
+    "npm-run-all": "^4.1.3",
+    "onchange": "^6.1.1",
+    "style-loader": "^0.23.1",
+    "ts-node": "^7.0.1",
+    "url-loader": "^1.1.2",
+    "webpack": "^5.2.0",
+    "webpack-cli": "^3.3.12"
+  },
+  "scripts": {
+    "tscW": "tsc -w",
+    "serve": "live-server build --watch=build",
+    "start": "npm-run-all --parallel watch serve",
+    "build": "tsc && webpack --mode=development && gulp",
+    "watch": "onchange 'src/**/*' -- npm run build",
+    "buildProduction": "tsc && webpack --mode=production && gulp"
+  },
+  "author": "Lukas Pravda",
+  "license": "Apache License 2.0"
+}

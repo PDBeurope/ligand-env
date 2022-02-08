@@ -1,0 +1,21 @@
+{
+    "compilerOptions": {
+        "noImplicitAny": false,
+        "alwaysStrict": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "target": "es2016",
+        "lib": ["es5", "es6", "es7", "es2015.collection", "dom", "es2015.promise"],
+        "sourceMap": false,
+        "declaration": true,
+        "module": "none",
+        "moduleResolution": "node",
+        "out": "build/pdb-ligand-env-plugin.js"
+    },
+    "include": ["src/plugin/**/*", ],
+    "exclude": [
+        "node_modules",
+        "build",
+        "dist"
+    ]
+}

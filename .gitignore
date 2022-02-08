@@ -1,0 +1,6 @@
+.vscode
+.DS_Store
+.mypy_cache
+node_modules
+
+build/*

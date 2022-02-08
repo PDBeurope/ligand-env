@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<script src="https://d3js.org/d3.v5.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<!--testing purposes only-->
+<link rel="stylesheet" href="pdb-ligand-env-svg.css" />
+<link rel="stylesheet" href="https://ebi.emblstatic.net/web_guidelines/EBI-Icon-fonts/v1.3/fonts.css" />
+
+<!-- MOL* -->
+<link rel="stylesheet" type="text/css"
+    href="https://www.ebi.ac.uk/pdbe/pdb-component-library/css/pdbe-molstar-1.1.0.css">
+<script src="https://www.ebi.ac.uk/pdbe/pdb-component-library/js/pdbe-molstar-plugin-1.1.0.js"></script>
+
+<!-- Web component polyfill (only loads what it needs) -->
+<script src="https://cdn.jsdelivr.net/npm/@webcomponents/webcomponentsjs/webcomponents-lite.js" charset="utf-8">
+</script>
+<!-- Required to polyfill modern browsers as code is ES5 for IE... -->
+<script src="https://cdn.jsdelivr.net/npm/@webcomponents/webcomponentsjs/custom-elements-es5-adapter.js"
+    charset="utf-8"></script>
+
+<script type="module" src="pdb-ligand-env-component-1.0.0-min.js"></script>
+<script>
+    var renderBmInteractions = function (id, bmId) {
+        var int =
+            `<pdb-ligand-env style="border: 1px solid black" pdb-id="${id}" bound-molecule-id="${bmId}" zoom-on environment="dev"></pdb-ligand-env>`
+        document.getElementById('rt').innerHTML = int;
+    };
+
+    var renderLigandInteractions = function (id, chain, resId) {
+        var int =
+            `<pdb-ligand-env style="border: 1px solid black" pdb-id="${id}" pdb-chain-id="${chain}" pdb-res-id="${resId}" zoom-on environment="dev"></pdb-ligand-env>`
+        document.getElementById('rt').innerHTML = int;
+    };
+
+    var parseParameters = function (par) {
+        let result = {}
+
+        par.split('&').forEach(x => {
+            let splitted = x.split('=');
+            result[splitted[0].toLowerCase()] = splitted[1].toLowerCase();
+        });
+
+        if (result.bmid === undefined) {
+            result['query'] =
+                `https://www.ebi.ac.uk/pdbe/model-server/v1/${result.pdbid}/residueInteraction?auth_asym_id=${result.chain}&auth_seq_id=${result.resid}&radius=5&data_source=pdb-h`
+        } else {
+            result['query'] = `https://www.ebi.ac.uk/pdbe/model-server/v1/${result.pdbid}/full?data_source=pdb-h`
+        }
+
+        if (result.chain !== undefined) result.chain = result.chain.toUpperCase();
+
+        return result;
+    };
+
+    (function () {
+        'use strict';
+        $(document)
+            .ready(function ($http) {
+                var tokens = window.location.href.split('/').reverse();
+                let params = {};
+
+                if (tokens[0].startsWith('?')) {
+                    params = parseParameters(tokens[0].slice(1));
+                } else {
+                    params = {
+                        pdbid: '1cbs',
+                        chain: 'A_1',
+                        resid: 200,
+                        query: "https://www.ebi.ac.uk/pdbe/model-server/v1/1cbs/residueInteraction?auth_asym_id=A_1&auth_seq_id=200&radius=5&data_source=pdb-h"
+                    };
+                }
+
+                if (params.bmid === undefined) {
+                    renderLigandInteractions(params.pdbid, params.chain, params.resid);
+                } else {
+                    renderBmInteractions(params.pdbid, params.bmid);
+                }
+
+                var initParams = {
+                    moleculeId: params.pdbid,
+                    pdbeUrl: 'https://www.ebi.ac.uk/pdbe/',
+                    loadMaps: false,
+                    bgColor: {
+                        r: 255,
+                        g: 250,
+                        b: 250
+                    },
+                    lowPrecisionCoords: true,
+                    isExpanded: false,
+                    hideControls: true,
+                    showLogs: false,
+                    subscribeEvents: true,
+                    showPDBeLogo: false,
+                    subscribeEvents: true,
+                    ligandView: {
+                        auth_seq_id: params.resid,
+                        auth_asym_id: params.chain,
+                        hydrogens: true
+                    }
+                }
+                var pdbeMolstar = new PDBeMolstarPlugin();
+                pdbeMolstar.render(document.getElementById('3dViewer'), initParams);
+            });
+    }());
+</script>
+
+
+<body>
+    <div style="position: relative; float: left;">
+        <div id="rt" style="width: 500px; height: 500px; position: relative">
+        </div>
+    </div>
+    <div style="position: relative; float: left;">
+        <div id='3dViewer' style="position:relative; width: 500px;height: 500px;"></div>
+    </div>
+    <!-- <div style="position: relative; float: left;">
+        <div id="rt 1" style="width: 500px; height: 500px; position: relative">
+            <pdb-ligand-env pdb-id="5e98" bound-molecule-id="bm1" zoom-on></pdb-ligand-env>
+        </div>
+    </div>
+    <div style="position: relative; float: left;">
+        <div id="rt 1" style="width: 500px; height: 500px; position: relative">
+            <pdb-ligand-env pdb-id="5e98" bound-molecule-id="bm1" entity-id="3" zoom-on></pdb-ligand-env>
+        </div>
+    </div> -->
+
+    <!--
+        Further use in the app for bound molecule interactions:
+
+        <pdb-ligand-env pdb-id="3d12" bound-molecule-id="bm1"></pdb-ligand-env>
+
+        for ligand interactions:
+        <pdb-ligand-env pdb-id="3d12" pdb-chain-id="A" pdb-res-id="200"></pdb-ligand-env>
+    -->
+    <script>
+
+    </script>
+</body>
+
+</html>

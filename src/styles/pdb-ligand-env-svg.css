@@ -1,0 +1,163 @@
+
+.pdb-lig-env-svg-shadow-bond {
+    stroke-width: 10px;
+    stroke: transparent;
+}
+
+.pdb-lig-env-svg-bond {
+    fill: none;
+    fill-rule: evenodd;
+    stroke-linecap: butt;
+    stroke-linejoin: miter;
+    stroke-opacity: 1;
+}
+
+.pdb-lig-env-svg-bond-ligand {
+    stroke-width: 4px;
+    stroke: black;
+}
+
+.pdb-lig-env-svg-bond-electrostatic {
+    stroke-width: 2px;
+    stroke-dasharray: 10 10;
+    stroke: #3F26BF;
+}
+
+.pdb-lig-env-svg-bond-stacking {
+    stroke-width: 2px;
+    stroke-dasharray: 10 10;
+    stroke: green;
+}
+
+.pdb-lig-env-svg-bond-atom-pi {
+    stroke-width: 2px;
+    stroke-dasharray: 10 10;
+    stroke: #2E8B57;
+}
+
+.pdb-lig-env-svg-bond-amide {
+    stroke-width: 2px;
+    stroke-dasharray: 10 10;
+    stroke: green;
+}
+
+.pdb-lig-env-svg-bond-vdw {
+    stroke-width: 2px;
+    stroke-dasharray: 10 10;
+    stroke: #9B7653;
+}
+
+.pdb-lig-env-svg-bond-hydrophobic {
+    stroke-width: 0px;
+}
+
+.pdb-lig-env-svg-bond-aromatic {
+    stroke-width: 4px;
+    stroke-dasharray: 1 10;
+    stroke: #AD4379;
+}
+
+.pdb-lig-env-svg-bond-metal {
+    stroke-width: 4px;
+    stroke: #008080;
+}
+
+.pdb-lig-env-svg-bond-clashes {
+    stroke-width: 2px;
+    stroke-dasharray: 10 10;
+    stroke: #FF5050;
+}
+
+.pdb-lig-env-svg-bond-covalent {
+    stroke-width: 3px;
+    stroke: black;
+}
+
+.pdb-lig-env-svg-bond-other {
+    stroke-width: 1px;
+    stroke-dasharray: 10 10;
+    stroke: black;
+}
+
+.pdb-lig-env-svg-bond-highlighted line {
+    stroke-width: 10px !important;
+}
+
+.pdb-lig-env-svg-node circle {
+    stroke-width: 3px;
+}
+
+.pdb-lig-env-svg-node text {
+    cursor: inherit;
+    font-family: 'Exo 2', sans-serif;
+    stroke: black !important;
+    fill: black !important;
+}
+
+.pdb-lig-env-svg-node text tspan:first-child {
+    cursor: inherit;
+    font-weight: 100;
+    font-size: 21px;
+}
+
+.pdb-lig-env-svg-node text tspan:nth-child(2) {
+    cursor: inherit;
+    font-weight: lighter;
+    font-size: 18px;
+}
+
+.pdb-lig-env-svg-ligand-res {
+    stroke: black;
+    fill: white;
+}
+
+.pdb-lig-env-svg-water-res {
+    stroke: #A9A9A9;
+    fill: #00BFFF;
+}
+
+.pdb-lig-env-svg-cystein-res {
+    stroke: #A9A9A9;
+    fill: #F08080;
+}
+
+.pdb-lig-env-svg-positive-res {
+    stroke: #A9A9A9;
+    fill: #F01505;
+}
+
+.pdb-lig-env-svg-negative-res {
+    stroke: #A9A9A9;
+    fill: #C048C0;
+}
+
+.pdb-lig-env-svg-proline-res {
+    stroke: #A9A9A9;
+    fill: #C0C000;
+}
+
+.pdb-lig-env-svg-polar-res {
+    stroke: #A9A9A9;
+    fill: #15C015;
+}
+
+.pdb-lig-env-svg-aromatic-res {
+    stroke: #A9A9A9;
+    fill: #15A4A4;
+}
+
+.pdb-lig-env-svg-hydrophobic-res {
+    stroke: #A9A9A9;
+    fill: #80A0F0;
+}
+
+.pdb-lig-env-svg-glycine-res {
+    stroke: #A9A9A9;
+    fill: #F09048;
+}
+ 
+.pdb-lig-env-svg-other-res {
+    stroke: #A9A9A9;
+    fill: #F2F2F2;
+
+}

@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <script src="https://d3js.org/d3.v5.min.js"></script>
+  <!-- CSS style to be used for scene drawing (required for saving SVGs.) -->
+  <link rel="stylesheet" href="http://127.0.0.1:8080/pdb-ligand-env-svg.css" />
+  <link rel="stylesheet" href="http://127.0.0.1:8080/pdb-ligand-env.css" />
+  <!-- UI icons -->
+  <link rel="stylesheet" href="https://ebi.emblstatic.net/web_guidelines/EBI-Icon-fonts/v1.3/fonts.css" />
+  <!-- Web component polyfill (only loads what it needs) -->
+  <script src="https://cdn.jsdelivr.net/npm/@webcomponents/webcomponentsjs/webcomponents-lite.js" charset="utf-8">
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/@webcomponents/webcomponentsjs/custom-elements-es5-adapter.js"
+    charset="utf-8"></script>
+
+  <!--PDBe interactions plugin-->
+  <script src="http://127.0.0.1:8080/pdb-ligand-env-plugin.js"></script>
+
+  <!--Initialize Visualization-->
+  <script>
+    document.addEventListener("DOMContentLoaded", function (event) {
+      //<!--Mode A-->
+      var eleLigInteraction = document.getElementById('ligand-interaction');
+      this.lidisplay = new Visualization(eleLigInteraction, undefined);
+      this.lidisplay.initLigandInteractions('1cbs', 200, 'A');
+
+      //<!--Mode B-->
+      var eleBoundInteraction = document.getElementById('boundmolecule-interaction');
+      this.bmdisplay = new Visualization(eleBoundInteraction, undefined);
+      this.bmdisplay.initBoundMoleculeInteractions('3d12', 'bm1');
+
+      //<!--Mode C-->
+      var eleChemComp = document.getElementById('chem-comp');
+      this.ccdisplay = new Visualization(eleChemComp, undefined);
+      this.ccdisplay.initLigandDisplay('HEM');
+    });
+  </script>
+
+</head>
+
+<body>
+  <!--Mode A-->
+  <div style="position: relative; float: left;">
+    <div style="width: 600px; height: 600px; position: relative">
+      <div id='ligand-interaction'></div>
+    </div>
+  </div>
+
+  <!--Mode B-->
+  <div style="position: relative; float: left;">
+    <div style="width: 600px; height: 600px; position: relative">
+      <div id='boundmolecule-interaction'></div>
+    </div>
+
+    <!--Mode C-->
+    <div style="position: relative; float: left;">
+      <div style="width: 600px; height: 600px; position: relative">
+        <div id='chem-comp'></div>
+      </div>
+    </div>
+
+</body>
+
+</html>

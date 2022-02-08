@@ -1,0 +1,307 @@
+[
+    {
+        "name": "Abe",
+        "het_codes": [
+            "ABE"
+        ]
+    },
+    {
+        "name": "All",
+        "het_codes": [
+            "ALL",
+            "AFD"
+        ]
+    },
+    {
+        "name": "AllNAc",
+        "het_codes": [
+            "NAA"
+        ]
+    },
+    {
+        "name": "Alt",
+        "het_codes": [
+            "SHD"
+        ]
+    },
+    {
+        "name": "Api",
+        "het_codes": [
+            "XXM"
+        ]
+    },
+    {
+        "name": "Ara",
+        "het_codes": [
+            "ARA",
+            "ARB"
+        ]
+    },
+    {
+        "name": "Bac",
+        "het_codes": [
+            "B6D"
+        ]
+    },
+    {
+        "name": "DDManHep",
+        "het_codes": [
+            "289"
+        ]
+    },
+    {
+        "name": "Fru",
+        "het_codes": [
+            "BDF"
+        ]
+    },
+    {
+        "name": "Fuc",
+        "het_codes": [
+            "FUC",
+            "FUL"
+        ]
+    },
+    {
+        "name": "Gal",
+        "het_codes": [
+            "GAL",
+            "GLA"
+        ]
+    },
+    {
+        "name": "GalA",
+        "het_codes": [
+            "ADA",
+            "GTR"
+        ]
+    },
+    {
+        "name": "GalN",
+        "het_codes": [
+            "X6X",
+            "1GN"
+        ]
+    },
+    {
+        "name": "GalNAc",
+        "het_codes": [
+            "NGA",
+            "A2G"
+        ]
+    },
+    {
+        "name": "Glc",
+        "het_codes": [
+            "GLC",
+            "BGC"
+        ]
+    },
+    {
+        "name": "GlcA",
+        "het_codes": [
+            "GCU",
+            "BDP"
+        ]
+    },
+    {
+        "name": "GlcN",
+        "het_codes": [
+            "GCS",
+            "PA1"
+        ]
+    },
+    {
+        "name": "GlcNAc",
+        "het_codes": [
+            "NAG",
+            "NDG"
+        ]
+    },
+    {
+        "name": "Gul",
+        "het_codes": [
+            "GUP",
+            "GL0"
+        ]
+    },
+    {
+        "name": "GulA",
+        "het_codes": [
+            "LGU"
+        ]
+    },
+    {
+        "name": "GulNAc",
+        "het_codes": [
+            "LXB"
+        ]
+    },
+    {
+        "name": "Ido",
+        "het_codes": [
+            "4N2"
+        ]
+    },
+    {
+        "name": "IdoA",
+        "het_codes": [
+            "IDR"
+        ]
+    },
+    {
+        "name": "IdoNAc",
+        "het_codes": [
+            "HSQ"
+        ]
+    },
+    {
+        "name": "Kdn",
+        "het_codes": [
+            "KDN",
+            "KDM"
+        ]
+    },
+    {
+        "name": "Kdo",
+        "het_codes": [
+            "KDO"
+        ]
+    },
+    {
+        "name": "LDManHep",
+        "het_codes": [
+            "GMH"
+        ]
+    },
+    {
+        "name": "Lyx",
+        "het_codes": [
+            "LDY"
+        ]
+    },
+    {
+        "name": "Man",
+        "het_codes": [
+            "MAN",
+            "BMA"
+        ]
+    },
+    {
+        "name": "ManA",
+        "het_codes": [
+            "MAV",
+            "BEM"
+        ]
+    },
+    {
+        "name": "ManN",
+        "het_codes": [
+            "95Z"
+        ]
+    },
+    {
+        "name": "ManNAc",
+        "het_codes": [
+            "BM3",
+            "BM7"
+        ]
+    },
+    {
+        "name": "Mur",
+        "het_codes": [
+            "MUR"
+        ]
+    },
+    {
+        "name": "MurNAc",
+        "het_codes": [
+            "AMU",
+            "MUB"
+        ]
+    },
+    {
+        "name": "Neu5Ac",
+        "het_codes": [
+            "SIA",
+            "SLB"
+        ]
+    },
+    {
+        "name": "Neu5Gc",
+        "het_codes": [
+            "NGC",
+            "NGE"
+        ]
+    },
+    {
+        "name": "Oli",
+        "het_codes": [
+            "DDA"
+        ]
+    },
+    {
+        "name": "Par",
+        "het_codes": [
+            "PZU"
+        ]
+    },
+    {
+        "name": "Pse",
+        "het_codes": [
+            "6PZ"
+        ]
+    },
+    {
+        "name": "Qui",
+        "het_codes": [
+            "G6D"
+        ]
+    },
+    {
+        "name": "Rha",
+        "het_codes": [
+            "RAM",
+            "RM4"
+        ]
+    },
+    {
+        "name": "Rib",
+        "het_codes": [
+            "RIP",
+            "0MK"
+        ]
+    },
+    {
+        "name": "Sor",
+        "het_codes": [
+            "SOE"
+        ]
+    },
+    {
+        "name": "Tag",
+        "het_codes": [
+            "T6T"
+        ]
+    },
+    {
+        "name": "TalA",
+        "het_codes": [
+            "X0X",
+            "X1X"
+        ]
+    },
+    {
+        "name": "Tyv",
+        "het_codes": [
+            "TYV"
+        ]
+    },
+    {
+        "name": "Xyl",
+        "het_codes": [
+            "XYS",
+            "XYP"
+        ]
+    }
+]

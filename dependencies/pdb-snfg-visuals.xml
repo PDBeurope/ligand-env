@@ -1,0 +1,299 @@
+<root>
+  <glycans>
+    <!--Hexose-->
+    <g name="Glc">
+      <circle style="stroke:black;stroke-width:3;fill-rule:nonzero;fill:#0090bc;fill-opacity:1" r="30" />
+    </g>
+    <g name="Man">
+      <circle style="stroke:black;stroke-width:3;fill-rule:nonzero;fill:#00a651;fill-opacity:1" r="30" />
+    </g>
+    <g name="Gal">
+      <circle style="stroke:black;stroke-width:3;fill-rule:nonzero;fill:#ffd400;fill-opacity:1" r="30" />
+    </g>
+    <g name="Gul">
+      <circle style="stroke:black;stroke-width:3;fill-rule:nonzero;fill:#f47920;fill-opacity:1" r="30" />
+    </g>
+    <g name="Alt">
+      <circle style="stroke:black;stroke-width:3;fill-rule:nonzero;fill:#f69ea1;fill-opacity:1" r="30" />
+    </g>
+    <g name="All">
+      <circle style="stroke:black;stroke-width:3;fill-rule:nonzero;fill:#a54399;fill-opacity:1" r="30" />
+    </g>
+    <g name="Tal">
+      <circle style="stroke:black;stroke-width:3;fill-rule:nonzero;fill:#8fcce9;fill-opacity:1" r="30" />
+    </g>
+    <g name="Ido">
+      <circle style="stroke:black;stroke-width:3;fill-rule:nonzero;fill:#a17a4d;fill-opacity:1" r="30" />
+    </g>
+    <!--HexNAc-->
+    <g name="GlcNAc" transform="translate(-30,-30)">
+      <rect x="0" y="0" width="60" height="60" style="stroke:black;stroke-width:3;fill-rule:nonzero;fill:#0090bc;fill-opacity:1" />
+    </g>
+    <g name="ManNAc" transform="translate(-30,-30)">
+      <rect x="0" y="0" width="60" height="60" style="stroke:black;stroke-width:3;fill-rule:nonzero;fill:#00a651;fill-opacity:1" />
+    </g>
+    <g name="GalNAc" transform="translate(-30,-30)">
+      <rect x="0" y="0" width="60" height="60" style="stroke:black;stroke-width:3;fill-rule:nonzero;fill:#ffd400;fill-opacity:1" />
+    </g>
+    <g name="GulNAc" transform="translate(-30,-30)">
+      <rect x="0" y="0" width="60" height="60" style="stroke:black;stroke-width:3;fill-rule:nonzero;fill:#f47920;fill-opacity:1" />
+    </g>
+    <g name="AltNAc" transform="translate(-30,-30)">
+      <rect x="0" y="0" width="60" height="60" style="stroke:black;stroke-width:3;fill-rule:nonzero;fill:#f69ea1;fill-opacity:1" />
+    </g>
+    <g name="AllNAc" transform="translate(-30,-30)">
+      <rect x="0" y="0" width="60" height="60" style="stroke:black;stroke-width:3;fill-rule:nonzero;fill:#a54399;fill-opacity:1" />
+    </g>
+    <g name="TalNAc" transform="translate(-30,-30)">
+      <rect x="0" y="0" width="60" height="60" style="stroke:black;stroke-width:3;fill-rule:nonzero;fill:#8fcce9;fill-opacity:1" />
+    </g>
+    <g name="IdoNAc" transform="translate(-30,-30)">
+      <rect x="0" y="0" width="60" height="60" style="stroke:black;stroke-width:3;fill-rule:nonzero;fill:#a17a4d;fill-opacity:1" />
+    </g>
+    <!--Hexosamine-->
+    <g name="GlcN" transform="translate(-30,-30)">
+      <path style="stroke:none;fill-rule:nonzero;fill:#0090bc;fill-opacity:1" d="M0 0 L60 0 L60 60 Z"/>
+      <path style="stroke:none;fill-rule:nonzero;fill:#ffffff;fill-opacity:1" d="M0 0 L0 60 L60 60 Z"/>
+      <rect x="0" y="0" width="60" height="60" style="fill:none;stroke-width:3;stroke-linecap:butt;stroke-linejoin:miter;stroke:#000000;stroke-opacity:1;stroke-miterlimit:10;"/>
+      <path style="fill:none;stroke-width:1.5;stroke-linecap:butt;stroke-linejoin:miter;stroke:#000000;stroke-opacity:1;stroke-miterlimit:10;" d="M 0 0 L60 60" />
+    </g>
+    <g name="ManN" transform="translate(-30,-30)">
+      <path style="stroke:none;fill-rule:nonzero;fill:#00a651;fill-opacity:1" d="M0 0 L60 0 L60 60 Z"/>
+      <path style="stroke:none;fill-rule:nonzero;fill:#ffffff;fill-opacity:1" d="M0 0 L0 60 L60 60 Z"/>
+      <rect x="0" y="0" width="60" height="60" style="fill:none;stroke-width:3;stroke-linecap:butt;stroke-linejoin:miter;stroke:#000000;stroke-opacity:1;stroke-miterlimit:10;"/>
+      <path style="fill:none;stroke-width:1.5;stroke-linecap:butt;stroke-linejoin:miter;stroke:#000000;stroke-opacity:1;stroke-miterlimit:10;" d="M 0 0 L60 60" />
+    </g>
+    <g name="GalN" transform="translate(-30,-30)">
+      <path style="stroke:none;fill-rule:nonzero;fill:#ffd400;fill-opacity:1" d="M0 0 L60 0 L60 60 Z"/>
+      <path style="stroke:none;fill-rule:nonzero;fill:#ffffff;fill-opacity:1" d="M0 0 L0 60 L60 60 Z"/>
+      <rect x="0" y="0" width="60" height="60" style="fill:none;stroke-width:3;stroke-linecap:butt;stroke-linejoin:miter;stroke:#000000;stroke-opacity:1;stroke-miterlimit:10;"/>
+      <path style="fill:none;stroke-width:1.5;stroke-linecap:butt;stroke-linejoin:miter;stroke:#000000;stroke-opacity:1;stroke-miterlimit:10;" d="M 0 0 L60 60" />
+    </g>
+    <g name="GulN" transform="translate(-30,-30)">
+      <path style="stroke:none;fill-rule:nonzero;fill:#f47920;fill-opacity:1" d="M0 0 L60 0 L60 60 Z"/>
+      <path style="stroke:none;fill-rule:nonzero;fill:#ffffff;fill-opacity:1" d="M0 0 L0 60 L60 60 Z"/>
+      <rect x="0" y="0" width="60" height="60" style="fill:none;stroke-width:3;stroke-linecap:butt;stroke-linejoin:miter;stroke:#000000;stroke-opacity:1;stroke-miterlimit:10;"/>
+      <path style="fill:none;stroke-width:1.5;stroke-linecap:butt;stroke-linejoin:miter;stroke:#000000;stroke-opacity:1;stroke-miterlimit:10;" d="M 0 0 L60 60" />
+    </g>
+    <g name="AltN" transform="translate(-30,-30)">
+      <path style="stroke:none;fill-rule:nonzero;fill:#f69ea1;fill-opacity:1" d="M0 0 L60 0 L60 60 Z"/>
+      <path style="stroke:none;fill-rule:nonzero;fill:#ffffff;fill-opacity:1" d="M0 0 L0 60 L60 60 Z"/>
+      <rect x="0" y="0" width="60" height="60" style="fill:none;stroke-width:3;stroke-linecap:butt;stroke-linejoin:miter;stroke:#000000;stroke-opacity:1;stroke-miterlimit:10;"/>
+      <path style="fill:none;stroke-width:1.5;stroke-linecap:butt;stroke-linejoin:miter;stroke:#000000;stroke-opacity:1;stroke-miterlimit:10;" d="M 0 0 L60 60" />
+    </g>
+    <g name="AllN" transform="translate(-30,-30)">
+      <path style="stroke:none;fill-rule:nonzero;fill:#a54399;fill-opacity:1" d="M0 0 L60 0 L60 60 Z"/>
+      <path style="stroke:none;fill-rule:nonzero;fill:#ffffff;fill-opacity:1" d="M0 0 L0 60 L60 60 Z"/>
+      <rect x="0" y="0" width="60" height="60" style="fill:none;stroke-width:3;stroke-linecap:butt;stroke-linejoin:miter;stroke:#000000;stroke-opacity:1;stroke-miterlimit:10;"/>
+      <path style="fill:none;stroke-width:1.5;stroke-linecap:butt;stroke-linejoin:miter;stroke:#000000;stroke-opacity:1;stroke-miterlimit:10;" d="M 0 0 L60 60" />
+    </g>
+    <g name="TalN" transform="translate(-30,-30)">
+      <path style="stroke:none;fill-rule:nonzero;fill:#8fcce9;fill-opacity:1" d="M0 0 L60 0 L60 60 Z"/>
+      <path style="stroke:none;fill-rule:nonzero;fill:#ffffff;fill-opacity:1" d="M0 0 L0 60 L60 60 Z"/>
+      <rect x="0" y="0" width="60" height="60" style="fill:none;stroke-width:3;stroke-linecap:butt;stroke-linejoin:miter;stroke:#000000;stroke-opacity:1;stroke-miterlimit:10;"/>
+      <path style="fill:none;stroke-width:1.5;stroke-linecap:butt;stroke-linejoin:miter;stroke:#000000;stroke-opacity:1;stroke-miterlimit:10;" d="M 0 0 L60 60" />
+    </g>
+    <g name="IdoN" transform="translate(-30,-30)">
+      <path style="stroke:none;fill-rule:nonzero;fill:#a17a4d;fill-opacity:1" d="M0 0 L60 0 L60 60 Z"/>
+      <path style="stroke:none;fill-rule:nonzero;fill:#ffffff;fill-opacity:1" d="M0 0 L0 60 L60 60 Z"/>
+      <rect x="0" y="0" width="60" height="60" style="fill:none;stroke-width:3;stroke-linecap:butt;stroke-linejoin:miter;stroke:#000000;stroke-opacity:1;stroke-miterlimit:10;"/>
+      <path style="fill:none;stroke-width:1.5;stroke-linecap:butt;stroke-linejoin:miter;stroke:#000000;stroke-opacity:1;stroke-miterlimit:10;" d="M 0 0 L60 60" />
+    </g>
+    <!--Hexuronate-->
+    <g name="GlcA" transform="translate(-30,-30) rotate(-45 30 30)">
+      <path style="stroke:none;fill-rule:nonzero;fill:#0090bc;fill-opacity:1" d="M0 0 L60 0 L60 60 Z"/>
+      <path style="stroke:none;fill-rule:nonzero;fill:#ffffff;fill-opacity:1" d="M0 0 L0 60 L60 60 Z"/>
+      <rect x="0" y="0" width="60" height="60" style="fill:none;stroke-width:3;stroke-linecap:butt;stroke-linejoin:miter;stroke:#000000;stroke-opacity:1;stroke-miterlimit:10;"/>
+      <path style="fill:none;stroke-width:1.5;stroke-linecap:butt;stroke-linejoin:miter;stroke:#000000;stroke-opacity:1;stroke-miterlimit:10;" d="M 0 0 L60 60" />
+    </g>
+    <g name="ManA" transform="translate(-30,-30) rotate(-45 30 30)">
+      <path style="stroke:none;fill-rule:nonzero;fill:#00a651;fill-opacity:1" d="M0 0 L60 0 L60 60 Z"/>
+      <path style="stroke:none;fill-rule:nonzero;fill:#ffffff;fill-opacity:1" d="M0 0 L0 60 L60 60 Z"/>
+      <rect x="0" y="0" width="60" height="60" style="fill:none;stroke-width:3;stroke-linecap:butt;stroke-linejoin:miter;stroke:#000000;stroke-opacity:1;stroke-miterlimit:10;"/>
+      <path style="fill:none;stroke-width:1.5;stroke-linecap:butt;stroke-linejoin:miter;stroke:#000000;stroke-opacity:1;stroke-miterlimit:10;" d="M 0 0 L60 60" />
+    </g>
+    <g name="GalA" transform="translate(-30,-30) rotate(-45 30 30)">
+      <path style="stroke:none;fill-rule:nonzero;fill:#ffd400;fill-opacity:1" d="M0 0 L60 0 L60 60 Z"/>
+      <path style="stroke:none;fill-rule:nonzero;fill:#ffffff;fill-opacity:1" d="M0 0 L0 60 L60 60 Z"/>
+      <rect x="0" y="0" width="60" height="60" style="fill:none;stroke-width:3;stroke-linecap:butt;stroke-linejoin:miter;stroke:#000000;stroke-opacity:1;stroke-miterlimit:10;"/>
+      <path style="fill:none;stroke-width:1.5;stroke-linecap:butt;stroke-linejoin:miter;stroke:#000000;stroke-opacity:1;stroke-miterlimit:10;" d="M 0 0 L60 60" />
+    </g>
+    <g name="GulA" transform="translate(-30,-30) rotate(-45 30 30)">
+      <path style="stroke:none;fill-rule:nonzero;fill:#f47920;fill-opacity:1" d="M0 0 L60 0 L60 60 Z"/>
+      <path style="stroke:none;fill-rule:nonzero;fill:#ffffff;fill-opacity:1" d="M0 0 L0 60 L60 60 Z"/>
+      <rect x="0" y="0" width="60" height="60" style="fill:none;stroke-width:3;stroke-linecap:butt;stroke-linejoin:miter;stroke:#000000;stroke-opacity:1;stroke-miterlimit:10;"/>
+      <path style="fill:none;stroke-width:1.5;stroke-linecap:butt;stroke-linejoin:miter;stroke:#000000;stroke-opacity:1;stroke-miterlimit:10;" d="M 0 0 L60 60" />
+    </g>
+    <g name="AltA" transform="translate(-30,-30) rotate(-45 30 30)">
+      <path style="stroke:none;fill-rule:nonzero;fill:#f69ea1;fill-opacity:1" d="M0 0 L60 0 L60 60 Z"/>
+      <path style="stroke:none;fill-rule:nonzero;fill:#ffffff;fill-opacity:1" d="M0 0 L0 60 L60 60 Z"/>
+      <rect x="0" y="0" width="60" height="60" style="fill:none;stroke-width:3;stroke-linecap:butt;stroke-linejoin:miter;stroke:#000000;stroke-opacity:1;stroke-miterlimit:10;"/>
+      <path style="fill:none;stroke-width:1.5;stroke-linecap:butt;stroke-linejoin:miter;stroke:#000000;stroke-opacity:1;stroke-miterlimit:10;" d="M 0 0 L60 60" />
+    </g>
+    <g name="AllA" transform="translate(-30,-30) rotate(-45 30 30)">
+      <path style="stroke:none;fill-rule:nonzero;fill:#a54399;fill-opacity:1" d="M0 0 L60 0 L60 60 Z"/>
+      <path style="stroke:none;fill-rule:nonzero;fill:#ffffff;fill-opacity:1" d="M0 0 L0 60 L60 60 Z"/>
+      <rect x="0" y="0" width="60" height="60" style="fill:none;stroke-width:3;stroke-linecap:butt;stroke-linejoin:miter;stroke:#000000;stroke-opacity:1;stroke-miterlimit:10;"/>
+      <path style="fill:none;stroke-width:1.5;stroke-linecap:butt;stroke-linejoin:miter;stroke:#000000;stroke-opacity:1;stroke-miterlimit:10;" d="M 0 0 L60 60" />
+    </g>
+    <g name="TalA" transform="translate(-30,-30) rotate(-45 30 30)">
+      <path style="stroke:none;fill-rule:nonzero;fill:#8fcce9;fill-opacity:1" d="M0 0 L60 0 L60 60 Z"/>
+      <path style="stroke:none;fill-rule:nonzero;fill:#ffffff;fill-opacity:1" d="M0 0 L0 60 L60 60 Z"/>
+      <rect x="0" y="0" width="60" height="60" style="fill:none;stroke-width:3;stroke-linecap:butt;stroke-linejoin:miter;stroke:#000000;stroke-opacity:1;stroke-miterlimit:10;"/>
+      <path style="fill:none;stroke-width:1.5;stroke-linecap:butt;stroke-linejoin:miter;stroke:#000000;stroke-opacity:1;stroke-miterlimit:10;" d="M 0 0 L60 60" />
+    </g>
+    <g name="IdoA" transform="translate(-30,-30) rotate(-45 30 30)">
+      <path style="stroke:none;fill-rule:nonzero;fill:#a17a4d;fill-opacity:1" d="M0 0 L60 0 L60 60 Z"/>
+      <path style="stroke:none;fill-rule:nonzero;fill:#ffffff;fill-opacity:1" d="M0 0 L0 60 L60 60 Z"/>
+      <rect x="0" y="0" width="60" height="60" style="fill:none;stroke-width:3;stroke-linecap:butt;stroke-linejoin:miter;stroke:#000000;stroke-opacity:1;stroke-miterlimit:10;"/>
+      <path style="fill:none;stroke-width:1.5;stroke-linecap:butt;stroke-linejoin:miter;stroke:#000000;stroke-opacity:1;stroke-miterlimit:10;" d="M 0 0 L60 60" />
+    </g>
+    <!--Deoxyhexose-->
+    <g name="Qui" transform="translate(-30,-30)">
+      <polygon points="30,0 0,60 60,60" style="fill-rule:nonzero;fill:#0090bc;fill-opacity:1;stroke-width:3;stroke-linecap:butt;stroke-linejoin:miter;stroke:#000000;stroke-opacity:1;stroke-miterlimit:10;" />
+    </g>
+    <g name="Rha" transform="translate(-30,-30)">
+      <polygon points="30,0 0,60 60,60" style="fill-rule:nonzero;fill:#00a651;fill-opacity:1;stroke-width:3;stroke-linecap:butt;stroke-linejoin:miter;stroke:#000000;stroke-opacity:1;stroke-miterlimit:10;" />
+    </g>
+    <g name="6dGul" transform="translate(-30,-30)">
+      <polygon points="30,0 0,60 60,60" style="fill-rule:nonzero;fill:#f47920;fill-opacity:1;stroke-width:3;stroke-linecap:butt;stroke-linejoin:miter;stroke:#000000;stroke-opacity:1;stroke-miterlimit:10;" />
+    </g>
+    <g name="6dAlt" transform="translate(-30,-30)">
+      <polygon points="30,0 0,60 60,60" style="fill-rule:nonzero;fill:#f69ea1;fill-opacity:1;stroke-width:3;stroke-linecap:butt;stroke-linejoin:miter;stroke:#000000;stroke-opacity:1;stroke-miterlimit:10;" />
+    </g>
+    <g name="6dTal" transform="translate(-30,-30)">
+      <polygon points="30,0 0,60 60,60" style="fill-rule:nonzero;fill:#8fcce9;fill-opacity:1;stroke-width:3;stroke-linecap:butt;stroke-linejoin:miter;stroke:#000000;stroke-opacity:1;stroke-miterlimit:10;" />
+    </g>
+    <g name="Fuc" transform="translate(-30,-30)">
+      <polygon points="30,0 0,60 60,60" style="fill-rule:nonzero;fill:#ed1c24;fill-opacity:1;stroke-width:3;stroke-linecap:butt;stroke-linejoin:miter;stroke:#000000;stroke-opacity:1;stroke-miterlimit:10;" />
+    </g>
+    <!--DeoxyhexNAc-->
+    <g name="QuiNAc" transform="translate(-30,-30)">
+      <polygon points="30,0 30,60 60,60" style="fill-rule:nonzero;fill:#0090bc;fill-opacity:1;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke:#000000;stroke-opacity:1;stroke-miterlimit:10;" />
+      <polygon points="30,0 60,60 0,60" style="fill-rule:nonzero;fill:none;fill-opacity:1;stroke-width:3;stroke-linecap:butt;stroke-linejoin:miter;stroke:#000000;stroke-opacity:1;stroke-miterlimit:10;" />
+      <path d="M30 0 L30 60" style="fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:#000000;stroke-opacity:1;stroke-miterlimit:10;" />
+    </g>
+    <g name="RhaNAc" transform="translate(-30,-30)">
+      <polygon points="30,0 30,60 60,60" style="fill-rule:nonzero;fill:#00a651;fill-opacity:1;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke:#000000;stroke-opacity:1;stroke-miterlimit:10;" />
+      <polygon points="30,0 60,60 0,60" style="fill-rule:nonzero;fill:none;fill-opacity:1;stroke-width:3;stroke-linecap:butt;stroke-linejoin:miter;stroke:#000000;stroke-opacity:1;stroke-miterlimit:10;" />
+      <path d="M30 0 L30 60" style="fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:#000000;stroke-opacity:1;stroke-miterlimit:10;" />
+    </g>
+    <g name="6dAltNAc" transform="translate(-30,-30)">
+      <polygon points="30,0 30,60 60,60" style="fill-rule:nonzero;fill:#f69ea1;fill-opacity:1;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke:#000000;stroke-opacity:1;stroke-miterlimit:10;" />
+      <polygon points="30,0 60,60 0,60" style="fill-rule:nonzero;fill:none;fill-opacity:1;stroke-width:3;stroke-linecap:butt;stroke-linejoin:miter;stroke:#000000;stroke-opacity:1;stroke-miterlimit:10;" />
+      <path d="M30 0 L30 60" style="fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:#000000;stroke-opacity:1;stroke-miterlimit:10;" />
+    </g>
+    <g name="6dTalNAc" transform="translate(-30,-30)">
+      <polygon points="30,0 30,60 60,60" style="fill-rule:nonzero;fill:#8fcce9;fill-opacity:1;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke:#000000;stroke-opacity:1;stroke-miterlimit:10;" />
+      <polygon points="30,0 60,60 0,60" style="fill-rule:nonzero;fill:none;fill-opacity:1;stroke-width:3;stroke-linecap:butt;stroke-linejoin:miter;stroke:#000000;stroke-opacity:1;stroke-miterlimit:10;" />
+      <path d="M30 0 L30 60" style="fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:#000000;stroke-opacity:1;stroke-miterlimit:10;" />
+    </g>
+    <g name="FucNAc" transform="translate(-30,-30)">
+      <polygon points="30,0 30,60 60,60" style="fill-rule:nonzero;fill:#ed1c24;fill-opacity:1;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke:#000000;stroke-opacity:1;stroke-miterlimit:10;" />
+      <polygon points="30,0 60,60 0,60" style="fill-rule:nonzero;fill:none;fill-opacity:1;stroke-width:3;stroke-linecap:butt;stroke-linejoin:miter;stroke:#000000;stroke-opacity:1;stroke-miterlimit:10;" />
+      <path d="M30 0 L30 60" style="fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:#000000;stroke-opacity:1;stroke-miterlimit:10;" />
+    </g>
+    <!--Di-deoxyhexose-->
+    <g name="Oli" transform="translate(-30,-15)">
+      <rect x="0" y="0" width="60" height="30" style="stroke:black;stroke-width:3;fill-rule:nonzero;fill:#0090bc;fill-opacity:1" />
+    </g>
+    <g name="Tyv" transform="translate(-30,-15)">
+      <rect x="0" y="0" width="60" height="30" style="stroke:black;stroke-width:3;fill-rule:nonzero;fill:#00a651;fill-opacity:1" />
+    </g>
+    <g name="Abe" transform="translate(-30,-15)">
+      <rect x="0" y="0" width="60" height="30" style="stroke:black;stroke-width:3;fill-rule:nonzero;fill:#f47920;fill-opacity:1" />
+    </g>
+    <g name="Par" transform="translate(-30,-15)">
+      <rect x="0" y="0" width="60" height="30" style="stroke:black;stroke-width:3;fill-rule:nonzero;fill:#f69ea1;fill-opacity:1" />
+    </g>
+    <g name="Dig" transform="translate(-30,-15)">
+      <rect x="0" y="0" width="60" height="30" style="stroke:black;stroke-width:3;fill-rule:nonzero;fill:#a54399;fill-opacity:1" />
+    </g>
+    <g name="Col" transform="translate(-30,-15)">
+      <rect x="0" y="0" width="60" height="30" style="stroke:black;stroke-width:3;fill-rule:nonzero;fill:#8fcce9;fill-opacity:1" />
+    </g>
+    <!--Pentose-->
+    <g name="Ara" transform="translate(-57, -60.06)">
+      <polygon points="57.0,22.5 65.7,48.3 92.7,48.3 71.1,64.5 78.9,90.3 57.0,75.0 35.1,90.3 42.9,64.5 21.3,48.3 48.3,48.3" style="stroke:black;stroke-width:3;fill-rule:nonzero;fill:#00a651;fill-opacity:1" />
+    </g>
+    <g name="Lyx" transform="translate(-57, -60.06)">
+      <polygon points="57.0,22.5 65.7,48.3 92.7,48.3 71.1,64.5 78.9,90.3 57.0,75.0 35.1,90.3 42.9,64.5 21.3,48.3 48.3,48.3" style="stroke:black;stroke-width:3;fill-rule:nonzero;fill:#ffd400;fill-opacity:1" />
+    </g>
+    <g name="Xyl" transform="translate(-57, -60.06)">
+      <polygon points="57.0,22.5 65.7,48.3 92.7,48.3 71.1,64.5 78.9,90.3 57.0,75.0 35.1,90.3 42.9,64.5 21.3,48.3 48.3,48.3" style="stroke:black;stroke-width:3;fill-rule:nonzero;fill:#f47920;fill-opacity:1" />
+    </g>
+    <g name="Rib" transform="translate(-57, -60.06)">
+      <polygon points="57.0,22.5 65.7,48.3 92.7,48.3 71.1,64.5 78.9,90.3 57.0,75.0 35.1,90.3 42.9,64.5 21.3,48.3 48.3,48.3" style="stroke:black;stroke-width:3;fill-rule:nonzero;fill:#f69ea1;fill-opacity:1" />
+    </g>
+    <!--Deoxynonulosonate-->
+    <g name="Kdn" transform="translate(-30,-30)">
+      <rect x="0" y="0" width="60" height="60" style="stroke:black;stroke-width:3;fill-rule:nonzero;fill:#00a651;fill-opacity:1" />
+    </g>
+    <g name="Neu5Ac" transform="translate(-30,-30)">
+      <rect x="0" y="0" width="60" height="60" style="stroke:black;stroke-width:3;fill-rule:nonzero;fill:#a54399;fill-opacity:1" />
+    </g>
+    <g name="Neu5Gc" transform="translate(-30,-30)">
+      <rect x="0" y="0" width="60" height="60" style="stroke:black;stroke-width:3;fill-rule:nonzero;fill:#8fcce9;fill-opacity:1" />
+    </g>
+    <g name="Neu" transform="translate(-30,-30)">
+      <rect x="0" y="0" width="60" height="60" style="stroke:black;stroke-width:3;fill-rule:nonzero;fill:#a17a4d;fill-opacity:1" />
+    </g>
+    <g name="Sia" transform="translate(-30,-30)">
+      <rect x="0" y="0" width="60" height="60" style="stroke:black;stroke-width:3;fill-rule:nonzero;fill:#ed1c24;fill-opacity:1" />
+    </g>
+    <!--Di-deoxynonulosonate-->
+    <g name="Pse" transform="translate(-20.625, -38.25) rotate(90, 20.625,41.25)">
+      <polygon points="24.75,0 0,49.5 24.75,99 49.5,49.5" style="stroke:black;stroke-width:3;fill-rule:nonzero;fill:#00a651;fill-opacity:1" />
+    </g>
+    <g name="Leg" transform="translate(-20.625, -38.25) rotate(90, 20.625,41.25)">
+      <polygon points="24.75,0 0,49.5 24.75,99 49.5,49.5" style="stroke:black;stroke-width:3;fill-rule:nonzero;fill:#ffd400;fill-opacity:1" />
+    </g>
+    <g name="Aci" transform="translate(-20.625, -38.25) rotate(90, 20.625,41.25)">
+      <polygon points="24.75,0 0,49.5 24.75,99 49.5,49.5" style="stroke:black;stroke-width:3;fill-rule:nonzero;fill:#f69ea1;fill-opacity:1" />
+    </g>
+    <g name="4eLeg" transform="translate(-20.625, -38.25) rotate(90, 20.625,41.25)">
+      <polygon points="24.75,0 0,49.5 24.75,99 49.5,49.5" style="stroke:black;stroke-width:3;fill-rule:nonzero;fill:#8fcce9;fill-opacity:1" />
+    </g>
+    <!--Unkwnown-->
+    <g name="Bac" transform="translate(-22.2,-27.6)">
+      <polygon points="-18,30 0,0 42,0 60,30 42,60 0,60" style="stroke:black;stroke-width:3;fill-rule:nonzero;fill:#0090bc;fill-opacity:1" />
+    </g>
+    <g name="LDmanHep" transform="translate(-22.2,-27.6)">
+      <polygon points="-18,30 0,0 42,0 60,30 42,60 0,60" style="stroke:black;stroke-width:3;fill-rule:nonzero;fill:#00a651;fill-opacity:1" />
+    </g>
+    <g name="Kdo" transform="translate(-22.2,-27.6)">
+      <polygon points="-18,30 0,0 42,0 60,30 42,60 0,60" style="stroke:black;stroke-width:3;fill-rule:nonzero;fill:#ffd400;fill-opacity:1" />
+    </g>
+    <g name="Dha" transform="translate(-22.2,-27.6)">
+      <polygon points="-18,30 0,0 42,0 60,30 42,60 0,60" style="stroke:black;stroke-width:3;fill-rule:nonzero;fill:#f47920;fill-opacity:1" />
+    </g>
+    <g name="DDmanHep" transform="translate(-22.2,-27.6)">
+      <polygon points="-18,30 0,0 42,0 60,30 42,60 0,60" style="stroke:black;stroke-width:3;fill-rule:nonzero;fill:#f69ea1;fill-opacity:1" />
+    </g>
+    <g name="MurNAc" transform="translate(-22.2,-27.6)">
+      <polygon points="-18,30 0,0 42,0 60,30 42,60 0,60" style="stroke:black;stroke-width:3;fill-rule:nonzero;fill:#a54399;fill-opacity:1" />
+    </g>
+    <g name="MurNGc" transform="translate(-22.2,-27.6)">
+      <polygon points="-18,30 0,0 42,0 60,30 42,60 0,60" style="stroke:black;stroke-width:3;fill-rule:nonzero;fill:#8fcce9;fill-opacity:1" />
+    </g>
+    <g name="Mur" transform="translate(-22.2,-27.6)">
+      <polygon points="-18,30 0,0 42,0 60,30 42,60 0,60" style="stroke:black;stroke-width:3;fill-rule:nonzero;fill:#a17a4d;fill-opacity:1" />
+    </g>
+    <!--Assigned-->
+    <g name="Api" transform="translate(-30,-30)">
+      <polygon points="30,0 60,22 52,60 8,60 0,22" style="stroke:black;stroke-width:3;fill-rule:nonzero;fill:#0090bc;fill-opacity:1" />
+    </g>
+    <g name="Fru" transform="translate(-30,-30)">
+      <polygon points="30,0 60,22 52,60 8,60 0,22" style="stroke:black;stroke-width:3;fill-rule:nonzero;fill:#00a651;fill-opacity:1" />
+    </g>
+    <g name="Tag" transform="translate(-30,-30)">
+      <polygon points="30,0 60,22 52,60 8,60 0,22" style="stroke:black;stroke-width:3;fill-rule:nonzero;fill:#ffd400;fill-opacity:1" />
+    </g>
+    <g name="Sor" transform="translate(-30,-30)">
+      <polygon points="30,0 60,22 52,60 8,60 0,22" style="stroke:black;stroke-width:3;fill-rule:nonzero;fill:#f47920;fill-opacity:1" />
+    </g>
+    <g name="Psi" transform="translate(-30,-30)">
+      <polygon points="30,0 60,22 52,60 8,60 0,22" style="stroke:black;stroke-width:3;fill-rule:nonzero;fill:#f69ea1;fill-opacity:1" />
+    </g>
+  </glycans>
+</root>
