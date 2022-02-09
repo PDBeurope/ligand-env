@@ -164,3 +164,22 @@ this.display.initLigandDisplay('HEM', true);
 | zoom-on             | boolean   | No       | Allow zoom functionality on the component level. |
 | names-on            | boolean   | No       | Allow ligand depiction to be displayed with atom names. |
 | environment         | string    | No       | What data should be used: one of `production`, `development`, `internal` or a shorthand `prod`, `dev`, `int`. |
+
+## Versioning
+
+We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/PDBeurope/ligand-env/tags).
+
+## Authors
+
+* **Lukas Pravda** - *Initial work* - [lpravda](https://github.com/lpravda)
+* **Mihaly Varadi** - *Migrating to GitHub* - [mvaradi](https://github.com/mvaradi)
+
+See also the list of [contributors](https://github.com/PDBeurope/ligand-env/contributors) who participated in this project.
+
+## License
+
+This project is licensed under the EMBL-EBI License - see the [LICENSE](LICENSE) file for details
+
+## Acknowledgements
+
+We would like to thank the [PDBe team](https://www.pdbe.org) for their feedback and contributions.
