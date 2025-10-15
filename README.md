@@ -1,6 +1,6 @@
 # PDB LigandEnv component
 
-This is a web-component to display ligand structure in 2D along with its interactions. Ligand can be perceived as a set of covalently linked pdb residues (refered to as bound molecule) or a single pdb residue. This depiction can be enriched with substructure highlight, atom names, binding site interactions and aggregated protein-ligand interactions.
+This is a web-component to display ligand structure in 2D along with its interactions. Ligand can be perceived as a set of covalently linked pdb residues (refered to as bound molecule) or a single pdb residue. This depiction can be enriched with a substructure highlight, atom names, and binding site interactions.
 
 ## Installation
 
@@ -16,7 +16,7 @@ To see demo, copy demo directory to build and open any of the html pages.
 ## Component modes
 
 * Mode A: Display ligand and its interactions (Using pdb-id, pdb-res-id and pdb-chain-id)
-* Mode B: Display boundmolecule and its interactions (Using pdb-id and bound-molecule-id)
+* Mode B: Display a bound molecule and its interactions (Using pdb-id and bound-molecule-id)
 * Mode C: Display ligand only (Using pdb-res-name)
 * Mode D: Display ligand and aggregated interactions (Using pdb-res-name and contact-type)
 
@@ -36,10 +36,6 @@ Interactions data displayed by the component can come from three different envir
 A few files needs to be imported in the page before the component is attempted to be loaded:
 
 ```html
-
-<!-- D3 -->
-<script src="https://d3js.org/d3.v5.min.js"></script>
-
 <!-- CSS style to be used for scene drawing (required for saving SVGs.) -->
 <link rel="stylesheet" href="pdb-ligand-env-svg.css" />
 
@@ -55,7 +51,7 @@ A few files needs to be imported in the page before the component is attempted t
     charset="utf-8"></script>
 
 <!--PDBe interactions component-->
-<script type="module" src="pdb-ligand-env-component-2.1.0-beta-min.js"></script>
+<script type="module" src="pdb-ligand-env-component-3.0.0-min.js"></script>
 ```
 
 #### A) Ligand interactions
@@ -109,10 +105,6 @@ let component = document.getElementById('SIA-component');
 The component can be also added to DOM directly from JavaScript. There are some requirements
 
 ```html
-
-<!-- D3 -->
-<script src="https://d3js.org/d3.v5.min.js"></script>
-
 <!-- CSS style to be used for scene drawing (required for saving SVGs.) -->
 <link rel="stylesheet" href="pdb-ligand-env-svg.css" />
 
@@ -132,7 +124,12 @@ let component = document.getElementById('SIA-component');
 let environemnt = "development";
 let uiParams = {
     reinitialize: true, // allow reinitialize option in the component menu
-    zoom: true, // allow scene zoom
+    zoom: true, // enables camera on scene
+    zoomControlsOn: true, // turns on scroll and dbl click zooming and click and drag to pan
+    zoomControlsOff: false, // turns off scroll and dbl click zooming and click and drag to pan
+    disableScrollZoom: false, // turns off scroll zooming
+    menuOn: true, // allows component menu to be displayed
+    menuOff: false, // turns off component menu display
     fullScreen: true, // allow allow full screen option in the component menu
     downloadImage: true, // allow image download from  the component menu
     downloadData: true, // allow interactions data download from compoment menu
@@ -166,7 +163,7 @@ this.display.initLigandDisplay('STI').then(() => {
 
 ## Parameters
 
-| Parametr            | Type      | Required | Description |
+| Parameter            | Type      | Required | Description |
 |-------------------- | --------- | -------- | -------     |
 | pdb-id              | string    | No       | PDB id of a protein to retrieve interactions from. `(mode A and B only)` |
 | bound-molecule-id   | string    | No       | PDB bound molecule id `(mode A only)` |
@@ -177,6 +174,10 @@ this.display.initLigandDisplay('STI').then(() => {
 | substructure        | string[]  | No       | List of atom names to be highlighted on the ligand structure |
 | color               | string    | No       | HEX representation of the color highlight. `(Default: #D3D3D3)` |
 | zoom-on             | boolean   | No       | Allow zoom functionality on the component level. |
+| zoom-off             | boolean   | No       | Disables zoom functionality on the component level. |
+| scroll-zoom-on             | boolean   | No       | Disables scroll to zoom functionality on the component level. |
+| menu-on             | boolean   | No       | Allows component menu display. |
+| menu-off             | boolean   | No       | Disables component menu display. |
 | depiction-only      | boolean   | No       | Disables UI features, required to avoid downloading file needed for interactivity| 
 | names-on            | boolean   | No       | Allow ligand depiction to be displayed with atom names. |
 | environment         | string    | No       | What data should be used: one of `production`, `development`, `internal` or a shorthand `prod`, `dev`, `int`. |
@@ -191,7 +192,7 @@ We use [SemVer](http://semver.org/) for versioning. For the versions available, 
 * **Lukas Pravda** - *Initial work* - [lpravda](https://github.com/lpravda)
 * **Mihaly Varadi** - *Migrating to GitHub* - [mvaradi](https://github.com/mvaradi)
 * **Ibrahim Roshan** - *Aggregated interactions view* - [roshkjr](https://github.com/roshkjr)
-* **Marcelo Afonso** - *Bug fixes, Migrating v2, v2.1 to GitHub* - [marcelo-q](https://github.com/marcelo-q)
+* **Marcelo Afonso** - *Some updates and fixes, v2, v2.1, v3 GitHub migrations* - [marcelo-q](https://github.com/marcelo-q)
 
 See also the list of [contributors](https://github.com/PDBeurope/ligand-env/contributors) who participated in this project.
 

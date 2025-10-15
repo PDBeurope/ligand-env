@@ -1,3 +1,13 @@
+## RELEASE 3.0 - 15 October 2025
+
+
+* update to d3.v6 (now npm installed)
+* replaced 1.5 sec wait before centering vis for waiting until the interactions addition force layout simulation is stable; added pre-centering when semi-stable state reached; added reporting in user UI when simulation is still stabilizing
+* improved zooming and menu display controls
+* added nvmrc file
+* improved displayed tooltips for menu options
+* more modern tsconfig.json configs and split webpack configs for building component and plugin
+
 ## RELEASE 2.1 (beta) - 6 October 2025
 
 

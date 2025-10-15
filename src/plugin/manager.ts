@@ -1,3 +1,20 @@
+import { select, type Selection } from 'd3-selection';
+import { zoom, type ZoomBehavior, zoomIdentity } from 'd3-zoom';
+import { drag } from 'd3-drag';
+import {
+  forceSimulation, forceLink as d3ForceLink, forceManyBody,
+  forceCollide, forceCenter, type Simulation
+} from 'd3-force';
+import { min, max } from 'd3-array';
+import { json, text } from 'd3-fetch';
+import { Atom, Depiction, Vector2D } from './depiction';
+import * as Model from './model';
+import { VisualsMapper } from './visualsMapping';
+import { UI } from './ui';
+import * as Resources from './resources';
+import * as Config from './config';
+import { ResidueProvider } from './residuefactory';
+
 /**
  * This class contains methods for creating all the visualization
  * components of the LigandEnv
@@ -8,20 +25,22 @@
  * @param {string} env environment to fetch data from
  * 
  */
-class Visualization {
+export class Visualization {
     // component related
     private parent: HTMLElement;
+    private uiParameters: Config.UIParameters | undefined;
+    private renderMessageEl?: HTMLElement;
 
     // #region svg properties
-    private simulation: d3.Simulation<d3.SimulationNodeDatum, undefined>;
-    private svg: d3.Selection<any, {}, HTMLElement, any>;
-    private canvas: d3.Selection<SVGGElement, {}, HTMLElement, any>;
+    private simulation!: Simulation<Model.InteractionNode, Model.Link>;
+    private svg: Selection<SVGSVGElement, unknown, any, any>;
+    private canvas: Selection<SVGGElement, unknown, HTMLElement, any>;
 
-    private depictionRoot: d3.Selection<SVGGElement, {}, HTMLElement, any>;
-    private nodesRoot: d3.Selection<SVGGElement, {}, HTMLElement, any>;
-    private linksRoot: d3.Selection<SVGGElement, {}, HTMLElement, any>;
+    private depictionRoot: Selection<SVGGElement, unknown, HTMLElement, any>;
+    private nodesRoot!: Selection<SVGGElement, unknown, HTMLElement, any>;
+    private linksRoot!: Selection<SVGGElement, unknown, HTMLElement, any>;
 
-    private zoomHandler: d3.ZoomBehavior<Element, unknown>
+    private zoomHandler?: ZoomBehavior<SVGSVGElement, unknown>;
 
     private nodes: any;
     private links: any;
@@ -29,27 +48,27 @@ class Visualization {
 
     // #region data properties
     private environment: Model.Environment;
-    private pdbId: string;
-    private bindingSites: Model.BindingSite[];
-    private presentBindingSite: Model.BindingSite;
-    private depiction: Depiction;
+    private pdbId!: string;
+    private bindingSites!: Model.BindingSite[];
+    private presentBindingSite!: Model.BindingSite;
+    private depiction?: Depiction;
 
-    private visualsMapper: VisualsMapper;
+    private visualsMapper!: VisualsMapper;
     private interactionsData: any;
-    private ligandIntxData: Model.aggregatedInteractionData;
-    private selectedResidueHash: string;
-    private nodeDragged: boolean;
+    private ligandIntxData!: Model.aggregatedInteractionData;
+    private selectedResidueHash!: string;
+    private nodeDragged!: boolean;
 
-    private rProvider: ResidueProvider;
+    private rProvider!: ResidueProvider;
 
-    public fullScreen: boolean;
+    public fullScreen!: boolean;
     // #endregion
 
-    constructor(element: HTMLElement, uiParameters: Config.UIParameters = undefined, env: string = "production", depictionOnly: Boolean = false) {
+    constructor(element: HTMLElement, uiParameters: Config.UIParameters | undefined = undefined, env: string = "production", depictionOnly: Boolean = false) {
         this.parent = element;
         this.environment = this.parseEnvironment(env);
         this.parent.style.cssText += "display: block; height: 100%; width: 100%; position: relative;";
-        this.svg = d3.select(this.parent)
+        this.svg = select(this.parent)
                         .append('div')
                         .attr('id', 'pdb-lig-env-root')
                         .append('svg')
@@ -57,10 +76,18 @@ class Visualization {
                         .attr('xmlns', 'http://www.w3.org/2000/svg')
                         .attr('width', '100%')
                         .attr('height', '100%');
+
+        if (uiParameters?.zoom !== false) {
+            this.zoomHandler = this.getZoomHandler();
+            this.svg.call(this.zoomHandler);
+            this.disableScrollControlsIfNeeded(uiParameters);
+            this.disableScrollZoomIfNeeded(uiParameters);
+        }
+
         this.addMarkers();
         this.canvas = this.svg.append('g').attr('id', 'vis-root');
         this.depictionRoot = this.canvas.append('g').attr('id', 'depiction');
-        d3.select(this.parent).on('resize', () => this.resize());
+        select(this.parent).on('resize', () => this.resize());
 
         //the below properties are only needed if interactivity with the component is needed. 
         if(!depictionOnly){
@@ -69,7 +96,7 @@ class Visualization {
             this.bindingSites = new Array<Model.BindingSite>();
             this.fullScreen = false;
             this.nodeDragged = false;
-            if (uiParameters === undefined) uiParameters = new Config.UIParameters();
+            if (uiParameters === undefined) uiParameters = new Config.UIParameters(false);
             new UI(this.parent, this).register(uiParameters);
             this.linksRoot = this.canvas.append('g').attr('id', 'links');
             this.nodesRoot = this.canvas.append('g').attr('id', 'nodes');
@@ -83,19 +110,64 @@ class Visualization {
             document.addEventListener(Config.molstarMouseoutEvent, () => this.molstarMouseoutEventHandler());
 
         }
-    
+        this.uiParameters = uiParameters;
+        
         // this.addMarkers();
     }
 
     // #region event handlers
-    private getZoomHandler() {
-        return d3.zoom()
+    private getZoomHandler(): ZoomBehavior<SVGSVGElement, unknown> {
+        return zoom<SVGSVGElement, unknown>()
             .scaleExtent([1 / 10, 10])
-            .on('zoom', () => {
-                this.canvas.attr('transform', d3.event.transform)
+            .on('zoom', (event) => {
+                this.canvas.attr('transform', event.transform)
             });
     }
 
+    private showRenderMessage(show: boolean) {
+        if (show) {
+            if (!this.renderMessageEl) {
+                const msg = document.createElement('div');
+                msg.textContent = 'Rendering interactions...';
+                msg.style.position = 'absolute';
+                msg.style.bottom = '8px';
+                msg.style.left = '50%';
+                msg.style.transform = 'translateX(-50%)';
+                msg.style.fontSize = '16px';
+                msg.style.fontFamily = 'sans-serif';
+                msg.style.color = '#666';
+                msg.style.background = 'rgba(255,255,255,0.8)';
+                msg.style.padding = '2px 8px';
+                msg.style.borderRadius = '4px';
+                msg.style.pointerEvents = 'none';
+                msg.style.zIndex = '10';
+                this.parent.appendChild(msg);
+                this.renderMessageEl = msg;
+            }
+        } else {
+            if (this.renderMessageEl) {
+            this.renderMessageEl.remove();
+            this.renderMessageEl = undefined;
+            }
+        }
+    }
+
+    private disableScrollControlsIfNeeded(uiParameters?: Config.UIParameters) {
+        if (uiParameters?.zoomControls === false) {
+            // disable zooming by wheel or touch, but keep dblclick zoom
+            this.svg
+                .on('.zoom', null); // completely removes all zoom event listeners
+        }
+    }
+
+    private disableScrollZoomIfNeeded(uiParameters?: Config.UIParameters) {
+        if (uiParameters?.disableScrollZoom !== false) {
+            // disable zooming by wheel or touch, but keep dblclick zoom
+            this.svg
+                .on('wheel.zoom', null)
+                .on('touchstart.zoom', null);
+        }
+    }
 
     /**
      * Handle molstar click event. Makes interaction node highlight
@@ -127,7 +199,7 @@ class Visualization {
         const atomName = e.detail.name; // CustomEvent
         const atom = this.depiction.atoms.filter(x => x.name === atomName);
 
-        const selection = d3.select(`.${atomName}_Circles`);
+        const selection = select(`.${atomName}_Circles`);
         const nodes = selection.nodes();
         const lastElement = nodes[nodes.length - 1];
 
@@ -197,26 +269,26 @@ class Visualization {
         this.nodes?.attr('opacity', 1);
     }
 
-    private dragHandler = d3.drag()
+    private dragHandler = drag<Element, Model.InteractionNode>()
         .filter((x: Model.InteractionNode) => !x.static)
-        .on('start', (x: Model.InteractionNode) => {
-            if (!d3.event.active) this.simulation.alphaTarget(0.3).restart();
+        .on('start', (event, x: Model.InteractionNode) => {
+            if (!event.active) this.simulation.alphaTarget(0.3).restart();
 
             x.fx = x.x;
             x.fy = x.y;
         })
-        .on('drag', (x: Model.InteractionNode) => {
+        .on('drag', (event, x: Model.InteractionNode) => {
             this.nodeDragged = true;
 
-            x.fx = d3.event.x;
-            x.fy = d3.event.y;
+            x.fx = event.x;
+            x.fy = event.y;
         })
-        .on('end', (x: Model.InteractionNode) => {
+        .on('end', (event, x: Model.InteractionNode) => {
             this.nodeDragged = false;
 
-            if (!d3.event.active) this.simulation.alphaTarget(0);
-            x.fx = d3.event.x;
-            x.fy = d3.event.y;
+            if (!event.active) this.simulation.alphaTarget(0);
+            x.fx = event.x;
+            x.fy = event.y;
         });
 
     // #endregion event handlers
@@ -237,10 +309,9 @@ class Visualization {
         this.pdbId = pdbid;
         let url = Resources.boundMoleculeAPI(pdbid, bmId, this.environment);
 
-        d3.json(url)
+        json(url)
             .catch(e => this.processError(e, 'No interactions data are available.'))
-            .then((data: any) => this.addBoundMoleculeInteractions(data, bmId))
-            .then(() => new Promise(resolve => setTimeout(resolve, 1500)))
+            .then(async(data: any) => await this.addBoundMoleculeInteractions(data, bmId))
             .then(() => this.centerScene());
     }
 
@@ -260,10 +331,9 @@ class Visualization {
         this.pdbId = pdbid;
         let url = Resources.carbohydratePolymerAPI(pdbid, bmId, entityId, this.environment);
 
-        d3.json(url)
+        json(url)
             .catch(e => this.processError(e, 'No interactions data are available.'))
-            .then((data: any) => this.addBoundMoleculeInteractions(data, bmId))
-            .then(() => new Promise(resolve => setTimeout(resolve, 1500)))
+            .then(async(data: any) => await this.addBoundMoleculeInteractions(data, bmId))
             .then(() => this.centerScene());
     }
 
@@ -283,10 +353,9 @@ class Visualization {
         this.pdbId = pdbId;
         let url = Resources.ligandInteractionsAPI(pdbId, chainId, resId, this.environment);
 
-        d3.json(url)
+        json(url)
             .catch(e => this.processError(e, 'No interactions data are available.'))
-            .then((data: any) => this.addLigandInteractions(data, withNames))
-            .then(() => new Promise(resolve => setTimeout(resolve, 1500)))
+            .then( async (data: any) => await this.addLigandInteractions(data, withNames))
             .then(() => this.centerScene());
     }
 
@@ -301,7 +370,7 @@ class Visualization {
     public async initLigandDisplay(ligandId: string, withNames: boolean = false) {
         const ligandUrl = Resources.ligandAnnotationAPI(ligandId, this.environment);
 
-        return d3.json(ligandUrl)
+        return json(ligandUrl)
             .catch(e => this.processError(e, `Component ${ligandId} was not found.`))
             .then((d: any) => this.addDepiction(d, withNames))
             .then(() => this.centerScene());
@@ -317,7 +386,7 @@ class Visualization {
     
     public async initLigandWeights(ligandId: string){
         const weightUrl = Resources.interactionAPI(ligandId, this.environment);
-        return d3.json(weightUrl)
+        return json(weightUrl)
             .then((d: any) => this.ligandIntxData = d[ligandId]);
     }
 
@@ -348,7 +417,9 @@ class Visualization {
 
         this.depiction.addCircles(atomPropensity);
         if(this.zoomHandler !== undefined){
-            this.zoomHandler(this.svg, d3.zoomIdentity)
+            this.zoomHandler(this.svg, zoomIdentity);
+            this.disableScrollControlsIfNeeded(this.uiParameters);
+            this.disableScrollZoomIfNeeded(this.uiParameters);
         };
     }
 
@@ -366,7 +437,11 @@ class Visualization {
 
     public toggleZoom(active: boolean) {
         this.zoomHandler = active ? this.getZoomHandler() : undefined;
-        this.zoomHandler(this.svg, d3.zoomIdentity);
+        if (this.zoomHandler) {
+            this.zoomHandler(this.svg, zoomIdentity);
+            this.disableScrollControlsIfNeeded(this.uiParameters);
+            this.disableScrollZoomIfNeeded(this.uiParameters);
+        }
     }
 
 
@@ -378,7 +453,7 @@ class Visualization {
      * @param {string} [color=undefined] Color in #HEXHEX format.
      * @memberof Visualization
      */
-    public addLigandHighlight(highlight: string[], color: string = undefined) {
+    public addLigandHighlight(highlight: string[], color: string | undefined = undefined) {
         if (!this.depiction) return;
         this.depiction.highlightSubgraph(highlight, color);
     }
@@ -391,22 +466,23 @@ class Visualization {
      * @param {boolean} true if atom names to be displayed
      * @memberof Visualization
      */
-    public addLigandInteractions(data: any, withNames: boolean = false) {
+    public async addLigandInteractions(data: any, withNames: boolean = false) {
         let key = Object.keys(data)[0];
         let body = data[key][0];
         this.interactionsData = data;
 
         if (this.depiction === undefined || this.depiction.ccdId !== body.ligand.chem_comp_id) {
-            this.initLigandDisplay(body.ligand.chem_comp_id, withNames).then(() => {
-                this.presentBindingSite = new Model.BindingSite().fromLigand(key, body, this.depiction);
-                this.bindingSites.push(this.presentBindingSite);
-                this.setupLigandScene();
-            });
+            await this.initLigandDisplay(body.ligand.chem_comp_id, withNames);
+            this.presentBindingSite = new Model.BindingSite().fromLigand(key, body, this.depiction!);
+            this.bindingSites.push(this.presentBindingSite);
+            await this.setupLigandScene();
         } else {
             this.presentBindingSite = new Model.BindingSite().fromLigand(key, body, this.depiction);
             this.bindingSites.push(this.presentBindingSite);
-            this.setupLigandScene();
+            await this.setupLigandScene();
         }
+        // wait for DOM to apply final node transforms
+        await new Promise<void>(resolve => requestAnimationFrame(() => resolve()));
     }
 
 
@@ -418,7 +494,7 @@ class Visualization {
      * @param {string} bmId Bound molecule id
      * @memberof Visualization
      */
-    public addBoundMoleculeInteractions(data: any, bmId: string) {
+    public async addBoundMoleculeInteractions(data: any, bmId: string) {
         let key = Object.keys(data)[0];
         this.interactionsData = data;
         this.presentBindingSite = new Model.BindingSite().fromBoundMolecule(key, data[key][0]);
@@ -427,8 +503,10 @@ class Visualization {
         this.presentBindingSite.bmId = bmId;
         let ligands = this.presentBindingSite.residues.filter(x => x.isLigand);
 
-        if (ligands.length === 1) this.initLigandInteractions(this.pdbId, ligands[0].authorResidueNumber, ligands[0].chainId);
-        else this.setupScene();
+        if (ligands.length === 1) await this.initLigandInteractions(this.pdbId, ligands[0].authorResidueNumber, ligands[0].chainId);
+        else await this.setupScene();
+        // wait for DOM to apply final node transforms
+        await new Promise<void>(resolve => requestAnimationFrame(() => resolve()));
     }
 
 
@@ -441,7 +519,7 @@ class Visualization {
      * @memberof Visualization
      */
     public saveSvg() {
-        d3.text(Resources.ligEnvCSSAPI(this.environment))
+        text(Resources.ligEnvCSSAPI(this.environment))
             .then(x => {
                 let svgData = `
                 <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" style="background-color: white;">
@@ -519,28 +597,30 @@ class Visualization {
      * @memberof Visualization
      */
     public centerScene() {
+        if (!this.canvas || !this.canvas.node()) return;
         // Get the bounding box
         if (this.nodes !== undefined) {
-            let minX: any = d3.min(this.nodes.data().map((x) => x.x));
-            let minY: any = d3.min(this.nodes.data().map((x) => x.y));
+            let minX: any = min(this.nodes.data().map((x) => x.x));
+            let minY: any = min(this.nodes.data().map((x) => x.y));
 
-            let maxX: any = d3.max(this.nodes.data().map((x) => x.x));
-            let maxY: any = d3.max(this.nodes.data().map((x) => x.y));
-
+            let maxX: any = max(this.nodes.data().map((x) => x.x));
+            let maxY: any = max(this.nodes.data().map((x) => x.y));
             this.computeBoundingBox(minX, maxX, minY, maxY);
 
         } else if (this.depiction !== undefined) {
-            let minX: any = d3.min(this.depiction.atoms.map((x: Atom) => x.labels.length==0 ? x.position.x : x.position.x - 50));
-            let minY: any = d3.min(this.depiction.atoms.map((x: Atom) => x.labels.length==0 ? x.position.y : x.position.y - 50));
+            let minX: any = min(this.depiction.atoms.map((x: Atom) => x.labels.length==0 ? x.position.x : x.position.x - 50));
+            let minY: any = min(this.depiction.atoms.map((x: Atom) => x.labels.length==0 ? x.position.y : x.position.y - 50));
 
-            let maxX: any = d3.max(this.depiction.atoms.map((x: Atom) => x.labels.length==0 ? x.position.x : x.position.x + 50));
-            let maxY: any = d3.max(this.depiction.atoms.map((x: Atom) => x.labels.length==0 ? x.position.y : x.position.y + 50));
+            let maxX: any = max(this.depiction.atoms.map((x: Atom) => x.labels.length==0 ? x.position.x : x.position.x + 50));
+            let maxY: any = max(this.depiction.atoms.map((x: Atom) => x.labels.length==0 ? x.position.y : x.position.y + 50));
 
             this.computeBoundingBox(minX, maxX, minY, maxY);
         }
     }
 
     private computeBoundingBox(minX: number, maxX: number, minY: number, maxY: number) {
+        if (!this.zoomHandler) return;
+
         // Calculate the dimensions of the molecule
         let molWidth = maxX - minX;
         let molHeight = maxY - minY;
@@ -572,8 +652,12 @@ class Visualization {
 
         // Apply the transformation
         this.canvas.attr('transform', `translate(${xTrans}, ${yTrans}) scale(${scale})`);
-        let translation = d3.zoomIdentity.translate(xTrans, yTrans).scale(scale);
-        this.zoomHandler?.transform(this.svg, translation);
+        let translation = zoomIdentity.translate(xTrans, yTrans).scale(scale);
+        try {
+            this.zoomHandler?.transform(this.svg, translation);
+        } catch (err) {
+            console.warn("Zoom not initialized yet:", err);
+        }
     }
 
     // #endregion menu functions
@@ -587,7 +671,7 @@ class Visualization {
 
         if (this.depiction === undefined) {
             this.simulation
-                .force('center', d3.forceCenter(this.parent.offsetWidth / 2, this.parent.offsetHeight / 2))
+                .force('center', forceCenter(this.parent.offsetWidth / 2, this.parent.offsetHeight / 2))
                 .restart();
         } else this.simulation.restart();
 
@@ -604,8 +688,8 @@ class Visualization {
     private nullNodesPositions() {
         this.presentBindingSite.interactionNodes.forEach((x: Model.InteractionNode) => {
             if (!x.static) {
-                x.fx = null;
-                x.fy = null;
+                x.fx = undefined;
+                x.fy = undefined;
             }
         });
 
@@ -614,15 +698,15 @@ class Visualization {
     // #region fire events
 
     private fireExternalLinkEvent(link: Model.Link, eventName: string) {
-        let atomsSource = [];
-        let atomsTarget = [];
+        let atomsSource: string[] = [];
+        let atomsTarget: string[] = [];
 
         if (link instanceof Model.LigandResidueLink) {
-            let tmpSrc = [].concat.apply([], link.interaction.map(x => x.sourceAtoms));
-            atomsSource = [].concat.apply([], tmpSrc).filter((v, i, a) => a.indexOf(v) === i);
+            let tmpSrc = ([] as string[]).concat(...link.interaction.map(x => x.sourceAtoms));
+            atomsSource = tmpSrc.filter((v, i, a) => a.indexOf(v) === i);
 
-            let tmpTar = [].concat.apply([], link.interaction.map(x => x.targetAtoms));
-            atomsTarget = [].concat.apply([], tmpTar).filter((v, i, a) => a.indexOf(v) === i);
+            let tmpTar = ([] as string[]).concat(...link.interaction.map(x => x.targetAtoms));
+            atomsTarget = tmpTar.filter((v, i, a) => a.indexOf(v) === i);
         }
 
         const e = new CustomEvent(eventName, {
@@ -686,6 +770,13 @@ class Visualization {
         this.linksRoot.selectAll('*').remove();
     }
 
+    private getIndexAndGroup(event: MouseEvent) {
+        const target = event.currentTarget as SVGLineElement;
+        const group = target.parentNode?.childNodes as unknown as SVGGElement[];
+        const index = Array.prototype.indexOf.call(group, target);
+        return {index, group};
+    }
+
     private setupLinks() {
         this.links = this.linksRoot
             .selectAll()
@@ -695,15 +786,27 @@ class Visualization {
         this.links
             .append('line')
             .classed('pdb-lig-env-svg-shadow-bond', (x: Model.Link) => x.getLinkClass() !== 'hydrophobic')
-            .on('mouseenter', (x: Model.Link, index: number, group: any) => this.linkMouseOverEventHandler(x, index, group))
-            .on('mouseleave', (x: Model.Link, index: number, group: any) => this.linkMouseOutEventHandler(x, index, group));
+            .on('mouseenter', (event: MouseEvent, d: Model.Link) => {
+                const {index, group} = this.getIndexAndGroup(event);
+                this.linkMouseOverEventHandler(d, index, group);
+            })
+            .on('mouseleave', (event: MouseEvent, d: Model.Link) => {
+                const {index, group} = this.getIndexAndGroup(event);
+                this.linkMouseOutEventHandler(d, index, group);
+            });
 
         this.links
             .append('line')
             .attr('class', (e: Model.Link) => `pdb-lig-env-svg-bond pdb-lig-env-svg-bond-${e.getLinkClass()}`)
             .attr('marker-mid', (e: Model.Link) => e.hasClash() ? 'url(#clash)' : '')
-            .on('mouseenter', (x: Model.Link, y: any, z: any) => this.linkMouseOverEventHandler(x, y, z))
-            .on('mouseleave', (x: Model.Link, index: number, group: any) => this.linkMouseOutEventHandler(x, index, group));
+            .on('mouseenter', (event: MouseEvent, d: Model.Link) => {
+                const {index, group} = this.getIndexAndGroup(event);
+                this.linkMouseOverEventHandler(d, index, group);
+            })
+            .on('mouseleave', (event: MouseEvent, d: Model.Link) => {
+                const {index, group} = this.getIndexAndGroup(event);
+                this.linkMouseOutEventHandler(d, index, group);
+            });
     }
 
 
@@ -713,10 +816,10 @@ class Visualization {
             .append('text')
             .style('text-anchor', 'middle')
             .style('dominant-baseline', 'central')
-            .each(function (e: Model.InteractionNode) {
+            .each(function (this: SVGTextElement, e: Model.InteractionNode) {
                 let labels = [e.residue.chemCompId, e.residue.authorResidueNumber];
                 for (let i = 0; i < labels.length; i++) {
-                    d3.select(this)
+                    select(this)
                         .append('tspan')
                         .attr('dy', (i * 30) - 10)
                         .attr('x', 0)
@@ -786,14 +889,16 @@ class Visualization {
         this.presentBindingSite.interactionNodes
             .filter((x: Model.InteractionNode) => !x.residue.isLigand)
             .forEach((x: Model.InteractionNode) => {
-                let links = this.presentBindingSite.links.filter((y: Model.LigandResidueLink) => y.containsNode(x) && y.getLinkClass() !== 'hydrophobic');
+                let links = this.presentBindingSite.links
+                .filter((y): y is Model.LigandResidueLink => y.containsNode(x) && y.getLinkClass() !== 'hydrophobic');
 
-                links = links.length == 0 ? this.presentBindingSite.links.filter((y: Model.LigandResidueLink) => y.containsNode(x)) : links;
+                links = links.length == 0 ? this.presentBindingSite.links
+                .filter((y): y is Model.LigandResidueLink => y.containsNode(x)) : links;
                 let atom_names = links
-                    .map((y: Model.LigandResidueLink) => [].concat.apply([], y.interaction.map(z => z.sourceAtoms)));
+                    .map((y: Model.LigandResidueLink) => y.interaction.flatMap(z => z.sourceAtoms));
 
-                let concated = [].concat.apply([], atom_names);
-                let position: Vector2D = this.depiction.getInitalNodePosition(concated);
+                let concated = atom_names.flat();
+                let position: Vector2D = this.depiction!.getInitalNodePosition(concated);
 
                 x.x = position.x + Math.random() * 55;
                 x.y = position.y + Math.random() * 55;
@@ -813,8 +918,14 @@ class Visualization {
 
         this.nodes.filter((x: Model.InteractionNode) => !x.residue.isLigand)
             .attr('class', (x: Model.InteractionNode) => `pdb-lig-env-svg-node pdb-lig-env-svg-${x.residue.getResidueType()}-res`)
-            .on('mouseenter', (x: Model.InteractionNode, i: number, g: any) => this.nodeMouseoverEventHandler(x, i, g))
-            .on('mouseleave', (x: Model.InteractionNode, i: number, g: any) => this.nodeMouseoutEventHandler(x, i, g));
+            .on('mouseenter', (event: MouseEvent, x: Model.InteractionNode) => {
+                const {index, group} = this.getIndexAndGroup(event);
+                this.nodeMouseoverEventHandler(x, index, group);
+            })
+            .on('mouseleave', (event: MouseEvent, x: Model.InteractionNode) => {
+                const {index, group} = this.getIndexAndGroup(event);
+                this.nodeMouseoutEventHandler(x, index, group);
+            });
 
         this.nodes.filter((x: Model.InteractionNode) => !x.residue.isLigand && this.visualsMapper.glycanMapping.has(x.residue.chemCompId))
             .html((e: Model.InteractionNode) => this.visualsMapper.getGlycanImage(e.residue.chemCompId));
@@ -827,21 +938,43 @@ class Visualization {
         let nodesWithText = this.nodes.filter((x: Model.InteractionNode) => !x.residue.isLigand);
         this.addNodeLabels(nodesWithText);
 
-        let forceLink = d3.forceLink()
+        let forceLink = d3ForceLink()
             .links(this.links.filter((x: Model.LigandResidueLink) => x.getLinkClass() !== 'hydrophobic'))
             .distance(5);
 
-        let charge = d3.forceManyBody().strength(-80).distanceMin(10).distanceMax(20);
-        let collision = d3.forceCollide(50).iterations(10).strength(0.5);
+        let charge = forceManyBody().strength(-80).distanceMin(10).distanceMax(20);
+        let collision = forceCollide(50).iterations(10).strength(0.5);
 
-        this.simulation = d3.forceSimulation(this.presentBindingSite.interactionNodes)
+        this.simulation = forceSimulation(this.presentBindingSite.interactionNodes)
             .force('link', forceLink)
             .force('charge', charge) //strength
             .force('collision', collision)
             .on('tick', () => this.simulationStep());
 
         this.dragHandler(this.nodes);
-        if (this.zoomHandler !== undefined) this.zoomHandler(this.svg, d3.zoomIdentity);
+        if (this.zoomHandler !== undefined) {
+            this.zoomHandler(this.svg, zoomIdentity);
+            this.disableScrollControlsIfNeeded(this.uiParameters);
+            this.disableScrollZoomIfNeeded(this.uiParameters);
+        }
+
+        this.showRenderMessage(true);
+        return new Promise<void>((resolve) => {
+            const checkReady = () => {
+                // pre center scene before end of simulation
+                if (this.simulation.alpha() < 0.5) this.centerScene();
+                const alphaDone = this.simulation.alpha() < 0.05;
+                const nodesDrawn = this.nodes?.size?.() > 0;
+                const linksDrawn = this.links?.size?.() > 0;
+                if (alphaDone && nodesDrawn && linksDrawn)  {
+                    this.showRenderMessage(false);
+                    resolve();
+                } else {
+                requestAnimationFrame(checkReady);
+                }
+            };
+            requestAnimationFrame(checkReady);
+        });
     }
 
 
@@ -867,9 +1000,18 @@ class Visualization {
             .data(this.presentBindingSite.interactionNodes)
             .enter().append('g')
             .attr('class', (e: Model.InteractionNode) => `pdb-lig-env-svg-node pdb-lig-env-svg-${e.residue.getResidueType()}-res`)
-            .on('click', (x: Model.InteractionNode, i: number, g: any) => this.selectLigand(x, i, g))
-            .on('mouseover', (x: Model.InteractionNode, i: number, g: any) => this.nodeMouseoverEventHandler(x, i, g))
-            .on('mouseout', (x: Model.InteractionNode, i: number, g: any) => this.nodeMouseoutEventHandler(x, i, g));
+            .on('click', (event: MouseEvent, x: Model.InteractionNode) => {
+                const {index, group} = this.getIndexAndGroup(event);
+                this.selectLigand(x, index, group);
+            })
+            .on('mouseenter', (event: MouseEvent, x: Model.InteractionNode) => {
+                const {index, group} = this.getIndexAndGroup(event);
+                this.nodeMouseoverEventHandler(x, index, group);
+            })
+            .on('mouseleave', (event: MouseEvent, x: Model.InteractionNode) => {
+                const {index, group} = this.getIndexAndGroup(event);
+                this.nodeMouseoutEventHandler(x, index, group);
+            });
 
 
         this.nodes.filter((n: Model.InteractionNode) =>
@@ -882,16 +1024,18 @@ class Visualization {
 
         this.addNodeLabels(this.nodes);
 
-        let forceLink = d3.forceLink()
+        let forceLink = d3ForceLink<Model.InteractionNode, Model.Link>()
             .links(this.presentBindingSite.links)
-            .distance((x: Model.Link) => (<Model.InteractionNode>x.source).residue.isLigand && (<Model.InteractionNode>x.target).residue.isLigand ? 55 : 150)
+            .distance((x: Model.Link) =>
+                (<Model.InteractionNode>x.source).residue.isLigand
+                && (<Model.InteractionNode>x.target).residue.isLigand ? 55 : 150)
             .strength(0.5);
 
-        let charge = d3.forceManyBody().strength(-1000).distanceMin(55).distanceMax(250);
-        let collision = d3.forceCollide(45);
-        let center = d3.forceCenter(this.parent.offsetWidth / 2, this.parent.offsetHeight / 2);
+        let charge = forceManyBody().strength(-1000).distanceMin(55).distanceMax(250);
+        let collision = forceCollide(45);
+        let center = forceCenter(this.parent.offsetWidth / 2, this.parent.offsetHeight / 2);
 
-        this.simulation = d3.forceSimulation(this.presentBindingSite.interactionNodes)
+        this.simulation = forceSimulation(this.presentBindingSite.interactionNodes)
             .force('link', forceLink)
             .force('charge', charge) //strength
             .force('collision', collision)
@@ -899,7 +1043,29 @@ class Visualization {
             .on('tick', () => this.simulationStep());
 
         this.dragHandler(this.nodes);
-        if (this.zoomHandler !== undefined) this.zoomHandler(this.svg, d3.zoomIdentity);
+        if (this.zoomHandler !== undefined) {
+            this.zoomHandler(this.svg, zoomIdentity);
+            this.disableScrollControlsIfNeeded(this.uiParameters);
+            this.disableScrollZoomIfNeeded(this.uiParameters);
+        }
+
+        this.showRenderMessage(true);
+        return new Promise<void>((resolve) => {
+            const checkReady = () => {
+                // pre center scene before end of simulation
+                if (this.simulation.alpha() < 0.5) this.centerScene();
+                const alphaDone = this.simulation.alpha() < 0.05;
+                const nodesDrawn = this.nodes?.size?.() > 0;
+                const linksDrawn = this.links?.size?.() > 0;
+                if (alphaDone && nodesDrawn && linksDrawn)  {
+                    this.showRenderMessage(false);
+                    resolve();
+                } else {
+                requestAnimationFrame(checkReady);
+                }
+            };
+            requestAnimationFrame(checkReady);
+        });
     }
 
 
@@ -922,9 +1088,9 @@ class Visualization {
     private nodeHighlight(x: Model.InteractionNode, i: number, g: any) {
         x.scale = 1.5;
 
-        if (x.residue.isLigand) d3.select(g[i]).style('cursor', 'pointer');
+        if (x.residue.isLigand) select(g[i]).style('cursor', 'pointer');
 
-        d3.select(g[i])
+        select(g[i])
             //.transition()
             .attr('transform', () => `translate(${x.x},${x.y}) scale(${x.scale})`);
 
@@ -948,16 +1114,16 @@ class Visualization {
     private nodeDim(x: Model.InteractionNode, i: number, g: any) {
         if (!x.static) x.scale = 1.0;
 
-        if (x.residue.isLigand) d3.select(g[i]).style('cursor', 'default');
-        d3.select(g[i])
+        if (x.residue.isLigand) select(g[i]).style('cursor', 'default');
+        select(g[i])
             //.transition()
             .attr('transform', `translate(${x.x},${x.y}) scale(${x.scale})`);
     }
 
 
     private linkHighlight(x: Model.Link, i: number, g: any) {
-        let parent = d3.select(g[i]).node().parentNode;
-        d3.select(parent).classed('pdb-lig-env-svg-bond-highlighted', true);
+        let parent = select(g[i]).node().parentNode;
+        select(parent).classed('pdb-lig-env-svg-bond-highlighted', true);
 
         this.links
             .filter((l: Model.Link) => l !== x)
@@ -971,8 +1137,8 @@ class Visualization {
     }
 
     private linkDim(x: Model.Link, i: number, g: any) {
-        let parent = d3.select(g[i]).node().parentNode;
-        d3.select(parent).classed('pdb-lig-env-svg-bond-highlighted', false);
+        let parent = select(g[i]).node().parentNode;
+        select(parent).classed('pdb-lig-env-svg-bond-highlighted', false);
 
         this.links
             .filter((l: Model.Link) => l !== x)
@@ -1030,7 +1196,7 @@ class Visualization {
     }
 
     private parseEnvironment(env: string): Model.Environment {
-        let environment = undefined;
+        let environment: Model.Environments | undefined = undefined;
 
         if (env === undefined) {
             environment = Model.Environment.Production

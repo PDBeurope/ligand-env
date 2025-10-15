@@ -1,6 +1,5 @@
 <!doctype html>
 <html lang="en">
-<script src="https://d3js.org/d3.v5.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
 <!--testing purposes only-->
 <link rel="stylesheet" href="pdb-ligand-env-svg.css" />
@@ -18,7 +17,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@webcomponents/webcomponentsjs/custom-elements-es5-adapter.js"
     charset="utf-8"></script>
 
-<script type="module" src="pdb-ligand-env-component-1.0.0-min.js"></script>
+<script type="module" src="pdb-ligand-env-component-init-min.js"></script>
 <script>
     var renderBmInteractions = function (id, bmId) {
         var int =
@@ -42,7 +41,7 @@
 
         if (result.bmid === undefined) {
             result['query'] =
-                `https://www.ebi.ac.uk/pdbe/model-server/v1/${result.pdbid}/residueInteraction?auth_asym_id=${result.chain}&auth_seq_id=${result.resid}&radius=5&data_source=pdb-h`
+                `https://www.ebi.ac.uk/pdbe/model-server/v1/${result.pdbid}/residueSurroundings?auth_asym_id=${result.chain}&auth_seq_id=${result.resid}&radius=5&encoding=bcif&copy_all_categories=false&download=false?data_source=pdb-h`
         } else {
             result['query'] = `https://www.ebi.ac.uk/pdbe/model-server/v1/${result.pdbid}/full?data_source=pdb-h`
         }
@@ -64,9 +63,9 @@
                 } else {
                     params = {
                         pdbid: '1cbs',
-                        chain: 'A_1',
+                        chain: 'A',
                         resid: 200,
-                        query: "https://www.ebi.ac.uk/pdbe/model-server/v1/1cbs/residueInteraction?auth_asym_id=A_1&auth_seq_id=200&radius=5&data_source=pdb-h"
+                        query: "https://www.ebi.ac.uk/pdbe/model-server/v1/1cbs/residueSurroundings?auth_asym_id=A&auth_seq_id=200&radius=5&encoding=bcif&copy_all_categories=false&download=false?data_source=pdb-h"
                     };
                 }
 

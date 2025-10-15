@@ -2,7 +2,6 @@
 <html lang="en">
 
 <head>
-  <script src="https://d3js.org/d3.v5.min.js"></script>
   <!-- CSS style to be used for scene drawing (required for saving SVGs.) -->
   <link rel="stylesheet" href="http://127.0.0.1:8080/pdb-ligand-env-svg.css" />
   <link rel="stylesheet" href="http://127.0.0.1:8080/pdb-ligand-env.css" />
@@ -22,17 +21,17 @@
     document.addEventListener("DOMContentLoaded", function (event) {
       //<!--Mode A-->
       var eleLigInteraction = document.getElementById('ligand-interaction');
-      this.lidisplay = new Visualization(eleLigInteraction, undefined);
+      this.lidisplay = new PDBeLigandEnv.Visualization(eleLigInteraction, undefined);
       this.lidisplay.initLigandInteractions('1cbs', 200, 'A');
 
       //<!--Mode B-->
       var eleBoundInteraction = document.getElementById('boundmolecule-interaction');
-      this.bmdisplay = new Visualization(eleBoundInteraction, undefined);
+      this.bmdisplay = new PDBeLigandEnv.Visualization(eleBoundInteraction, undefined);
       this.bmdisplay.initBoundMoleculeInteractions('3d12', 'bm1');
 
       //<!--Mode C-->
       var eleChemComp = document.getElementById('chem-comp');
-      this.ccdisplay = new Visualization(eleChemComp, undefined);
+      this.ccdisplay = new PDBeLigandEnv.Visualization(eleChemComp, undefined);
       this.ccdisplay.initLigandDisplay('HEM');
     });
   </script>

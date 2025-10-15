@@ -1,3 +1,9 @@
+import { select, selectAll, type Selection } from 'd3-selection';
+import { sum, max, min } from 'd3-array';
+import { scaleSqrt, scaleLinear } from 'd3-scale';
+import * as Config from './config';
+import 'd3-transition';
+
 /**
  * This class contains all the details which are necessary for redrawing
  * RDKit style 2D molecule depiction on a client side as well as some
@@ -10,17 +16,17 @@
  * @param {any} data Json annotation of ligand SVG
  **/
 
-class Depiction {
+export class Depiction {
     ccdId: string;
     atoms: Atom[];
     bonds: Bond[];
 
     resolution: Vector2D;
     private parent: HTMLElement;
-    private root: d3.Selection<SVGGElement, unknown, null, undefined>;
-    private highlight: d3.Selection<SVGGElement, unknown, null, undefined>;
-    public weight: d3.Selection<SVGGElement, unknown, null, undefined>;
-    public structure: d3.Selection<SVGGElement, unknown, null, undefined>;
+    private root: Selection<SVGGElement, unknown, HTMLElement, undefined>;
+    private highlight: Selection<SVGGElement, unknown, HTMLElement, undefined>;
+    public weight: Selection<SVGGElement, unknown, HTMLElement, undefined>;
+    public structure: Selection<SVGGElement, unknown, HTMLElement, undefined>;
 
     constructor(parent: HTMLElement, root: any, data: any) {
         this.root = root;
@@ -38,8 +44,8 @@ class Depiction {
         let bds = new Set<string>();
 
         data.bonds.forEach(x => {
-            let atomA = this.atoms.find(e => e.name == x.bgn);
-            let atomB = this.atoms.find(e => e.name == x.end);
+            let atomA = this.atoms.find(e => e.name == x.bgn)!;
+            let atomB = this.atoms.find(e => e.name == x.end)!;
             let bond = new Bond(atomA, atomB, x.coords, x.style);
 
             let bondFlag = [atomA.name, atomB.name].sort().join("_");
@@ -79,7 +85,7 @@ class Depiction {
         let atoms = this.atoms.filter(x => atomNames.includes(x.name)).sort((x, y) => x.connectivity - y.connectivity);
         let thisAtom = atoms[0];
 
-        let bond = this.bonds.find(x => x.containsAtom(thisAtom));
+        let bond = this.bonds.find(x => x.containsAtom(thisAtom))!;
         let otherAtom = bond.getOtherAtom(thisAtom);
 
         // to place the residue node a bond apart from the bonding atom
@@ -111,7 +117,7 @@ class Depiction {
      * @param {string} color color to be used for higlighting
      * @memberof Depiction
      */
-    public highlightSubgraph(atoms: Array<string>, color: string = undefined) {
+    public highlightSubgraph(atoms: Array<string>, color: string | undefined = undefined) {
         if (!this.atoms) return;
         this.highlight.selectAll('*').remove();
         if(atoms){
@@ -168,7 +174,7 @@ class Depiction {
         //     .enter()
         //     .each(function(x: any){
         //         if(x.value >= q1){
-        //             d3.select(this)
+        //             select(this)
         //             .append('circle')
         //                 .attr('cx', x.position.x)
         //                 .attr('cy', x.position.y)
@@ -176,7 +182,7 @@ class Depiction {
         //                 .attr('fill', secondScale.colorScale(x.value))
         //                 .attr("fill-opacity", "0.5")
         //             if(x.value >= q3){
-        //                 d3.select(this)
+        //                 select(this)
         //                 .append('circle')
         //                     .attr('cx', x.position.x)
         //                     .attr('cy', x.position.y)
@@ -216,11 +222,11 @@ class Depiction {
                 //     if (x.value+"" === "0.00") return 0.0;
                 //     return "0.8";
                 // })
-                .on('mouseenter', (x:Atom, i:number, g:any) => {
-                    this.atomMouseEnterEventHandler(x, g[i], false);
+                .on('mouseenter', (event, d) => {
+                    this.atomMouseEnterEventHandler(d, event.currentTarget, true);
                 })
-                .on('mouseleave', (_x:Atom, _i:number, _g:any) => {
-                    this.atomMouseLeaveEventHandler(false);
+                .on('mouseleave', (_event) => {
+                    this.atomMouseLeaveEventHandler(true);
                 });     
             
             /**
@@ -237,7 +243,7 @@ class Depiction {
             //     .each(function (x: Atom) {
             //         if (x.labels.length > 0) {
             //             for (var i = 0; i < x.labels.length; i++) {
-            //                 d3.select(this)
+            //                 select(this)
             //                     .append('path')
             //                     .attr('d', x.labels[i].d)
             //                     .style("background-color", "white")
@@ -263,10 +269,10 @@ class Depiction {
          * large circles for high values 
         */
         const weights = this.atoms.map(x => x.value).filter(x => x > 0)
-        const weightMax = d3.max(weights);
-        const weightMin = d3.min(weights);
-        const radiusScale = d3.scaleSqrt([weightMin, weightMax], [10,30]);
-        const colorScale = d3.scaleLinear(
+        const weightMax = max(weights)!;
+        const weightMin = min(weights)!;
+        const radiusScale = scaleSqrt([weightMin, weightMax], [10,30]);
+        const colorScale = scaleLinear(
             [0, 0.01, weightMax],
             ["#f0fcf0","#a0bb9e","#505d50"]
         );
@@ -330,7 +336,7 @@ class Depiction {
             .attr('filter', 'labels')
             .each(function (x: any) {
                 for (var i = 0; i < x.labels.length; i++) {
-                    d3.select(this)
+                    select(this)
                         .append('path')
                         .attr('d', x.labels[i].d)
                         .style("background-color", "white")
@@ -346,7 +352,7 @@ class Depiction {
     //  * @memberof Depiction
     //  */
     // private hideStructureLabels() {
-    //     d3.selectAll('.structureLabels').remove();
+    //     selectAll('.structureLabels').remove();
     // }
 
     /**
@@ -359,12 +365,12 @@ class Depiction {
         let coords = new Array<Vector2D>();
 
         ids.forEach(x => {
-            let pos = this.atoms.find(y => y.name === x).position;
+            let pos = this.atoms.find(y => y.name === x)!.position;
             coords.push(pos);
         })
 
-        let x = d3.sum(coords, x => x.x) / coords.length;
-        let y = d3.sum(coords, x => x.y) / coords.length;
+        let x = sum(coords, x => x.x) / coords.length;
+        let y = sum(coords, x => x.y) / coords.length;
 
         return new Vector2D(x, y);
     }
@@ -400,7 +406,7 @@ class Depiction {
         this.removeHighlights();
         const scales = this.getScale()
         
-        const selectedCircle = d3.select(element)
+        const selectedCircle = select(element)
             .classed("selectedCircle", true)
             .style("stroke", "#FBBD1D")
             .style("stroke-width", 5);
@@ -441,7 +447,7 @@ class Depiction {
      */
     private removeHighlights(){
         const scales = this.getScale();
-        const selectedCircle = d3.selectAll(".selectedCircle");        
+        const selectedCircle = selectAll(".selectedCircle");        
         selectedCircle.classed("selectedCircle", false)
             .interrupt()
             .attr("r", () => {
@@ -534,7 +540,7 @@ class Depiction {
  * @param {any} labels Atom label
  * @param {Vector2D} position Position of the atom in 2D coordinate system.
  */
-class Atom {
+export class Atom {
     name: string;
     labels: any;
     position: Vector2D;
@@ -578,7 +584,7 @@ class Atom {
  * @param {number} x coordinate
  * @param {number} y coordinate
  */
-class Vector2D {
+export class Vector2D {
     x: number;
     y: number;
 
@@ -620,7 +626,7 @@ class Vector2D {
      * @memberof Point
      */
     public distanceTo(other: Vector2D): number {
-        return Math.sqrt(Math.pow(other.x - this.x, 2) + Math.pow(other.y - this.x, 2));
+        return Math.sqrt(Math.pow(other.x - this.x, 2) + Math.pow(other.y - this.y, 2));
     }
 
 
@@ -634,8 +640,8 @@ class Vector2D {
      * @memberof Point
      */
     public static composeVectors(points: Vector2D[]): Vector2D {
-        let x = d3.sum(points.map(x => x.x));
-        let y = d3.sum(points.map(x => x.y));
+        let x = sum(points.map(x => x.x));
+        let y = sum(points.map(x => x.y));
 
         return new Vector2D(x, y);
     }

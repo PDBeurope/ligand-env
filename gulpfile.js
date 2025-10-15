@@ -73,9 +73,20 @@ gulp.task('copyXML', () => {
         .pipe(gulp.dest('build/'));
 });
 
-gulp.task('concat', () => {
-    return gulp.src([`build/${PKG_JSON.name}-plugin.js`, `build/${PKG_JSON.name}-component-init.js`])
-        .pipe(concat(`${PKG_JSON.name}-component-${PKG_JSON.version}.js`))
+// gulp.task('concat', () => {
+//     return gulp.src([`build/${PKG_JSON.name}-plugin.js`, `build/${PKG_JSON.name}-component-init.js`])
+//         .pipe(concat(`${PKG_JSON.name}-component-${PKG_JSON.version}.js`))
+//         .pipe(header(license, {}))
+//         .pipe(header(banner, {}))
+//         .pipe(minify({
+//             noSource: true
+//         }))
+//         .pipe(gulp.dest('build/'));
+// });
+
+gulp.task('minifyComponent', () => {
+    return gulp.src([`build/${PKG_JSON.name}-component-init.js`])
+        .pipe(concat(`${PKG_JSON.name}-component-init.js`))
         .pipe(header(license, {}))
         .pipe(header(banner, {}))
         .pipe(minify({
@@ -95,11 +106,56 @@ gulp.task('minifyPlugin', () => {
         .pipe(gulp.dest('build/'));
 });
 
+gulp.task('copyVersioned', () => {
+    return gulp.src([
+        `build/pdb-ligand-env-plugin-min.js`,
+        `build/pdb-ligand-env-component-init-min.js`,
+        `build/pdb-ligand-env.css`,
+        `build/pdb-ligand-env-svg.css`
+    ])
+    .pipe(gulp.dest('build/'))
+    .on('end', () => {
+        const fs = require('fs');
+        const path = require('path');
+        const version = PKG_JSON.version;
+
+        const rename = (file) => {
+            const oldPath = path.join('build', file);
+            if (fs.existsSync(oldPath)) {
+                const ext = path.extname(file);
+                const base = path.basename(file, ext).replace('-init', '');
+                const baseBefore = base.includes('min') ? base.replace('min', '') : base;
+                const baseAfter = base.includes('min') ? '-min' : '';
+                const newName = `${baseBefore}-${version}${baseAfter}${ext}`.replace('--', '-');
+                fs.copyFileSync(oldPath, path.join('build', newName));
+                console.log(`✓ Copied ${file} → ${newName}`);
+            }
+        };
+
+        [
+            'pdb-ligand-env-plugin-min.js',
+            'pdb-ligand-env-component-init-min.js',
+            'pdb-ligand-env.css',
+            'pdb-ligand-env-svg.css'
+        ].forEach(rename);
+    });
+});
+
 gulp.task('createDoc', function (cb) {
     cp.exec('./node_modules/.bin/jsdoc -c jsdoc.json', function(err, stdout, stderr){
         cb(err);
     })
 });
 
-gulp.task('default', gulp.series('clean', 'copyAppCSS', 'concat', 'concatCSS',
-    'copyXML', 'copyIndex', 'copyMapping', 'minifyPlugin', 'createDoc'));
+gulp.task('default', gulp.series(
+    'clean',
+    'copyAppCSS',
+    'concatCSS',
+    'copyXML',
+    'copyIndex',
+    'copyMapping',
+    'minifyPlugin',
+    'minifyComponent',
+    'copyVersioned',
+    'createDoc'
+));

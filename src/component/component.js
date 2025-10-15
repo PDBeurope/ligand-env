@@ -1,6 +1,8 @@
 // Import the LitElement base class and html helper function
 import { LitElement } from 'lit-element';
 import "../styles/pdb-ligand-env.css";
+import { Visualization } from '../plugin/manager';
+import { UIParameters } from '../plugin/config';
 
 // Extend the LitElement base class
 /**
@@ -25,7 +27,11 @@ class pdbLigandEnv extends LitElement {
       chainId: { type: String, attribute: 'pdb-chain-id' },
       substructureHighlight: { type: Array, attribute: 'substructure' },
       substructureColor: { type: String, attribute: 'color' },
-      zoomOn: { type: Boolean, attribute: 'zoom-on' },
+      menuOn: { type: Boolean, attribute: 'menu-on' },
+      menuOff: { type: Boolean, attribute: 'menu-off' },
+      zoomControlsOn: { type: Boolean, attribute: 'zoom-on' },
+      zoomControlsOff: { type: Boolean, attribute: 'zoom-off' },
+      scrollZoomOn: { type: Boolean, attribute: 'scroll-zoom-on' },
       namesOn: { type: Boolean, attribute: 'names-on' },
       depictionOnly: {type: Boolean, attribute: 'depiction-only'},
       env: { type: String, attribute: 'environment' },
@@ -49,6 +55,7 @@ class pdbLigandEnv extends LitElement {
   }
 
   async connectedCallback() {
+    super.connectedCallback();
     this.renderLigandEnv();
   }
 
@@ -56,9 +63,14 @@ class pdbLigandEnv extends LitElement {
     this.innerHTML = "";
 
     this.highlightSubstructure = [];
-    let uiParams = new Config.UIParameters();
-    uiParams.zoom = this.zoomOn;
+    let uiParams = new UIParameters();
+    if (this.zoomControlsOn !== undefined) uiParams.zoomControls = this.zoomControlsOn;
+    if (this.zoomControlsOff !== undefined) uiParams.zoomControls = !this.zoomControlsOff;
+
+    uiParams.disableScrollZoom = this.scrollZoomOn !== undefined ? !this.scrollZoomOn : false;
     uiParams.menu = this.pdbId !== undefined;
+    if (this.menuOn !== undefined) uiParams.menu = this.menuOn;
+    if (this.menuOff !== undefined) uiParams.menu = !this.menuOff;
 
     let env = this.env === undefined ? "production" : this.env;
     let names = this.namesOn === undefined ? false : this.namesOn;

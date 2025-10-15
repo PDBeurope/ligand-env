@@ -1,9 +1,14 @@
+import { json } from 'd3-fetch';
+import * as Model from './model';
+import * as Resources from './resources';
+import * as Config from './config';
+
 /**
  * Singleton instance to provide residue abbreviations to the component
  *
  * @class ResidueProvider
  */
-class ResidueProvider {
+export class ResidueProvider {
     private static instance: ResidueProvider;
     private environment: Model.Environment;
     private mapping: Map<string, string>;
@@ -48,7 +53,7 @@ class ResidueProvider {
      * @returns {string} Single letter abbreviation of the ligand
      * @memberof ResidueProvider
      */
-    public getAminoAcidAbbreviation(name: string): string {
+    public getAminoAcidAbbreviation(name: string): string | undefined {
         return this.mapping.has(name) ? this.mapping.get(name) : undefined;
     }
 
@@ -63,7 +68,7 @@ class ResidueProvider {
         if (this.mapping.has(r.chemCompId) || r.isLigand) return;
 
         let url = Resources.residueTypeAPI(r.chemCompId, this.environment);
-        let res = d3.json(url).then(x => {
+        let res = json(url).then((x: any) => {
             let code = x[r.chemCompId][0].one_letter_code;
             this.mapping.set(r.chemCompId, code);
 

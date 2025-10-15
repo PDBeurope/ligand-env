@@ -7,10 +7,10 @@
  * @extends {Set<T>}
  * @template T
  */
-class ObjectSet<T> extends Set<T> { 
+export class ObjectSet<T> extends Set<T> { 
     
     public tryAdd(value: T): T {
-        let item = undefined;
+        let item: T | undefined = undefined;
 
         this.forEach((x: any) => {
             if (x.equals(value)) {

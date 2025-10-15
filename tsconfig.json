@@ -4,13 +4,16 @@
         "alwaysStrict": true,
         "noUnusedLocals": true,
         "noUnusedParameters": true,
-        "target": "es2016",
-        "lib": ["es5", "es6", "es7", "es2015.collection", "dom", "es2015.promise"],
+        "target": "es2019",
+        "lib": ["es2019", "dom"],
         "sourceMap": false,
         "declaration": true,
-        "module": "none",
+        "module": "es2020",
         "moduleResolution": "node",
-        "outFile": "build/pdb-ligand-env-plugin.js"
+        "outDir": "build/plugin",
+        "strict": true,
+        "esModuleInterop": true,
+        "skipLibCheck": true
     },
     "include": ["src/plugin/**/*", ],
     "exclude": [

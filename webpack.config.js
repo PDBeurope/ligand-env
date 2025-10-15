@@ -9,15 +9,25 @@ const config = {
   entry: ["./src/component/component.js"],
   output: {
     path: path.resolve(PACKAGE_ROOT_PATH, "build"),
-    filename: "pdb-ligand-env-component-init.js"
+    filename: "pdb-ligand-env-component-init.js",
+    library: {
+      type: "module"
+    },
+    environment: { module: true }
   },
+  experiments: { outputModule: true },
   target: "web",
   devtool: "source-map",
   resolve: {
-    extensions: [".js"]
+    extensions: [".ts", ".js"]
   },
   module: {
     rules: [
+      {
+        test: /\.ts$/,
+        use: "ts-loader",
+        exclude: /node_modules/,
+      },
       {
         test: /\.css$/,
         use: [
