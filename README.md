@@ -55,7 +55,7 @@ A few files needs to be imported in the page before the component is attempted t
     charset="utf-8"></script>
 
 <!--PDBe interactions component-->
-<script type="module" src="pdb-ligand-env-component-2.0.0-min.js"></script>
+<script type="module" src="pdb-ligand-env-component-2.1.0-beta-min.js"></script>
 ```
 
 #### A) Ligand interactions
@@ -191,7 +191,7 @@ We use [SemVer](http://semver.org/) for versioning. For the versions available, 
 * **Lukas Pravda** - *Initial work* - [lpravda](https://github.com/lpravda)
 * **Mihaly Varadi** - *Migrating to GitHub* - [mvaradi](https://github.com/mvaradi)
 * **Ibrahim Roshan** - *Aggregated interactions view* - [roshkjr](https://github.com/roshkjr)
-* **Marcelo Afonso** - *Migrating v2 to GitHub* - [marcelo-q](https://github.com/marcelo-q)
+* **Marcelo Afonso** - *Bug fixes, Migrating v2, v2.1 to GitHub* - [marcelo-q](https://github.com/marcelo-q)
 
 See also the list of [contributors](https://github.com/PDBeurope/ligand-env/contributors) who participated in this project.
 

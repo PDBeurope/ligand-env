@@ -161,7 +161,7 @@ class Depiction {
         const scales = this.getScale();
         this.weight.selectAll("*").remove();
         /**
-         * Here is your original weight drawing function
+         * Here is the original weight drawing function
          */
         // this.weight.selectAll()
         //     .data(data)
@@ -188,7 +188,7 @@ class Depiction {
         //     });
 
         /**
-         * Here is your original second weight drawing function
+         * Here is the original second weight drawing function
          */
         this.weight.selectAll()
             .data(data)
@@ -204,7 +204,7 @@ class Depiction {
                 .attr("r", x => x.value > 0 ? scales.radiusScale(x.value): 15) 
                 .attr("fill", x=> x.value > 0 ? scales.colorScale(x.value): '#ffffff')
                 /**
-                 * Since this is drawn below "structure" I've noticed fill-opacity
+                 * Since this is drawn below "structure" fill-opacity
                  * does not change anything actually
                  */
                 .attr("fill-opacity", "1")
@@ -224,7 +224,7 @@ class Depiction {
                 });     
             
             /**
-             * This is code I tested in the case we drawn "weight"
+             * This is code that could be use if we draw "weight"
              * on top of "structure"
              */
             // this.hideStructureLabels();

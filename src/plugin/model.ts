@@ -482,27 +482,35 @@ namespace Model {
          */
         private filterOutAromaticAtomAtomInteractions(src: Array<LigandResidueLink>): Array<LigandResidueLink> {
             let result = new Array<LigandResidueLink>();
-            src.forEach((x: LigandResidueLink) => {
+            for (const x of src) {
                 let isAtomAtom = x.interaction.map(y => y.interactionType).every(z => z === InteractionType.AtomAtom);
 
+                // If the link is classified as an aromatic interaction (pi–pi stacking etc).
+                // ... and all interactions are Atom–Atom (not plane–plane or atom–plane)
                 if (x.getLinkClass() === 'aromatic' && isAtomAtom) {
-                    let targetAtoms = x.interaction.map(y => y.targetAtoms).reduce((a, b) => a.concat(b));
+                    let targetAtoms = x.interaction.map(y => y.targetAtoms);
+                    if (targetAtoms.length == 0) continue;
+                    const flatTargetAtoms = targetAtoms.reduce((a, b) => a.concat(b), []);
+
                     let otherInteractions = new Set(src.filter(y => y.target.equals(x.target)));
                     otherInteractions.delete(x);
 
                     let otherBoundAtoms = Array.from(otherInteractions)
                         .map(y => y.interaction)
-                        .reduce((a, b) => a.concat(b))
+                        .reduce((a, b) => a.concat(b), [])
                         .map(y => y.targetAtoms)
-                        .reduce((a, b) => a.concat(b));
-
-                    if (otherBoundAtoms.includes(targetAtoms[0])) {
-                        return;
+                        .reduce((a, b) => a.concat(b), []);
+                    /*
+                    * If this atom–atom aromatic link is just a duplicate of another stacking
+                    * interaction already represented, skip it.
+                    */ 
+                    if (otherBoundAtoms.includes(flatTargetAtoms[0])) {
+                        continue;
                     }
                 }
 
                 result.push(x);
-            });
+            }
 
             return result;
         }

@@ -1,3 +1,8 @@
+## RELEASE 2.1 (beta) - 6 October 2025
+
+
+* Interactions view major bug fix
+
 ## RELEASE 2.0 - 6 December 2024
 
 
