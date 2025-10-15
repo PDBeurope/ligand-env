@@ -28,6 +28,16 @@ namespace Model {
         Internal
     }
 
+    export interface interactionTypeData {
+        atom: string;
+        residue: string;
+        count: number; 
+    }
+
+    export interface aggregatedInteractionData{
+        [key: string]: interactionTypeData[]
+    }
+
     export class InteractionTypeUtil {
         public static parse(value: string) {
             if (value === 'atom_atom') return InteractionType.AtomAtom;
@@ -59,6 +69,8 @@ namespace Model {
     /**
      * Data model representing a single residue, which is a part of the
      * bound molecule. This residue is unique in the entire binding site.
+     * @param {any} data 
+     * @param {boolean} isLigand true if the residue is a ligand
      */
     export class Residue {
         id: string
@@ -494,6 +506,117 @@ namespace Model {
 
             return result;
         }
+    }
+
+    export class LigandIntx{
+        data: aggregatedInteractionData;
+        contactTypes: string[];
+        filteredData: any;
+
+        constructor(data: any, contactTypes:string[]){
+            this.data = data;
+            this.contactTypes = contactTypes;
+            this.filteredData = this.getFilteredData();
+
+        }
+
+        private getFilteredData(){
+            const filteredData = new Array();
+            const dataContactTypes = Object.keys(this.data);
+            if(this.contactTypes.includes('TOTAL')){
+                for (const contactType of dataContactTypes){
+                    filteredData.push(...this.data[contactType]);
+                }
+            }
+            else{
+                for (const contactType of this.contactTypes){
+                    if (dataContactTypes.includes(contactType)){
+                        filteredData.push(...this.data[contactType]);
+                    }
+
+            }
+            }
+            return filteredData
+        }
+
+        public getAtomIntxPropensity(){
+            const atomCount = new Array();
+            this.filteredData.reduce(function(acc, currentValue){
+                if(!acc[currentValue.atom]){
+                    acc[currentValue.atom] = {"atom": currentValue.atom, "count": 0};
+                    atomCount.push(acc[currentValue.atom]);
+                }
+                acc[currentValue.atom].count += currentValue.count;
+                return acc
+            },{});
+
+            const totalIntx = atomCount.reduce(function(acc, currentValue){
+                acc += currentValue.count;
+                return acc;
+            }, 0)
+
+            const atomPropensity = atomCount.map((x) => 
+                ({"atom": x.atom,
+                 "value": (x.count/totalIntx)*100
+                })
+                );
+
+            return atomPropensity
+            
+        }
+    }
+
+    /**
+     * Data model representing scale of a circles
+     * Stores scale for radius and color
+     */
+    export class Scale{
+        radiusScale: any;
+        colorScale: any;
+
+        constructor(radiusScale:any, colorScale:any){
+            this.radiusScale = radiusScale;
+            this.colorScale = colorScale;
+        }
+    
+    }
+
+    /**
+     * Gradient object with three
+     * level scales for circles to highlight
+     * @param {any} weight
+     * @param {string} colorScheme color to be used for generating gradient 
+     */
+    export class Gradient {
+        weight: any;
+        colorScheme: string;
+    
+        constructor(weight: any, colorScheme:string){
+            this.weight = weight;
+            this.colorScheme = colorScheme;
+        }
+
+        /**
+         * Generates three level scales for the
+         * Gradient object
+         */
+        public getScales(){
+
+            const color = d3[`scheme${this.colorScheme}`][9];
+            const weightMax = Number(d3.max(this.weight));
+            const gradient = {firstScale: new Scale(d3.scaleLinear([0, weightMax], [20, 30]),
+                d3.scaleLinear([0,weightMax], ["#FFFFFF", color[4]])),
+                secondScale: new Scale(d3.scaleLinear([0,weightMax], [10, 20]),
+                d3.scaleLinear([0, weightMax], [color[5], color[7]])),
+                thirdScale: new Scale(d3.scaleLinear([0, weightMax], [2, 10]),
+                d3.scaleLinear([0, weightMax], [color[8], color[9]]))
+
+              };
+            
+              return gradient
+
+        }
+
     }
 
 }

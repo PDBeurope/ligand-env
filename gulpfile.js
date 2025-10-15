@@ -4,6 +4,7 @@ const del = require('del');
 const concat = require('gulp-concat');
 const header = require('gulp-header');
 const minify = require("gulp-minify");
+const cp = require('child_process');
 
 const PACKAGE_ROOT_PATH = process.cwd();
 const PKG_JSON = require(path.join(PACKAGE_ROOT_PATH, "package.json"));
@@ -18,7 +19,7 @@ const banner = ['/**',
 ].join('\n');
 
 const license = ['/**',
-    ' * Copyright 2019-2020 Lukas Pravda <lpravda@ebi.ac.uk>',
+    ' * Copyright 2024-2030 Protein Data Bank in Europe <pdbehelp@ebi.ac.uk>',
     ' * European Bioinformatics Institute (EBI, http://www.ebi.ac.uk/)',
     ' * European Molecular Biology Laboratory (EMBL, http://www.embl.de/)',
     ' * Licensed under the Apache License, Version 2.0 (the "License");',
@@ -94,5 +95,11 @@ gulp.task('minifyPlugin', () => {
         .pipe(gulp.dest('build/'));
 });
 
+gulp.task('createDoc', function (cb) {
+    cp.exec('./node_modules/.bin/jsdoc -c jsdoc.json', function(err, stdout, stderr){
+        cb(err);
+    })
+});
+
 gulp.task('default', gulp.series('clean', 'copyAppCSS', 'concat', 'concatCSS',
-    'copyXML', 'copyIndex', 'copyMapping', 'minifyPlugin'));
+    'copyXML', 'copyIndex', 'copyMapping', 'minifyPlugin', 'createDoc'));

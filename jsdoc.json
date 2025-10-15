@@ -1,0 +1,29 @@
+{
+  "tags": {
+    "allowUnknownTags": true
+  },
+  "opts": {
+    "template": "node_modules/better-docs",
+    "destination": "build/docs"
+  },
+  "plugins": [
+    "node_modules/better-docs/typescript",
+    "plugins/markdown"
+  ],
+  "source": {
+    "includePattern": "\\.(jsx|js|ts|tsx)$",
+    "include": ["README.md", "src/component", "src/plugin"]
+  },
+  "templates": {
+    "cleverLinks": false,
+    "monospaceLinks": false,
+    "default": {
+      "outputSourceFiles": true
+    },
+    "path": "ink-docstrap",
+    "theme": "cerulean",
+    "navType": "vertical",
+    "linenums": true,
+    "dateFormat": "MMMM Do YYYY, h:mm:ss a"
+  }
+}

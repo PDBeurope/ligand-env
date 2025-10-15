@@ -1,36 +1,33 @@
 /**
  * This class contains all the details which are necessary for redrawing
- * RDKIt style 2D molecule depiction on a client side as well as some
- * other logic which should hopefully help with the initial placement of
+ * RDKit style 2D molecule depiction on a client side as well as some
+ * other logic for initial placement of
  * binding partners in the residue-level view.
  *
- * @author Lukas Pravda <lpravda@ebi.ac.uk>
  * @class Depiction
- * @param {string} ccdId PDB CCD id.
- * @param {Atom[]} atoms List of atoms.
- * @param {Bond[]} bonds Visual representation of bonds.
- * They do not correlate 1:1 with a number of bonds!
- * @param {Vector2D} resolution x,y dimension of the image. Needs to be used
- * for a scene shift, so it is centered.
- */
+ * @param {HTMLElement} parent HTMLElement on which depiction to be displayed.
+ * @param {any} root SVG element for the depiction.
+ * @param {any} data Json annotation of ligand SVG
+ **/
+
 class Depiction {
     ccdId: string;
     atoms: Atom[];
     bonds: Bond[];
 
     resolution: Vector2D;
-
+    private parent: HTMLElement;
     private root: d3.Selection<SVGGElement, unknown, null, undefined>;
-    private structure: d3.Selection<SVGGElement, unknown, null, undefined>;
-    private contour: d3.Selection<SVGGElement, unknown, null, undefined>;
     private highlight: d3.Selection<SVGGElement, unknown, null, undefined>;
+    public weight: d3.Selection<SVGGElement, unknown, null, undefined>;
+    public structure: d3.Selection<SVGGElement, unknown, null, undefined>;
 
-    constructor(parent: any, data: any) {
-        this.root = parent
-
+    constructor(parent: HTMLElement, root: any, data: any) {
+        this.root = root;
+        this.parent = parent;
         this.highlight = this.root.append('g').attr('id', 'highlight');
+        this.weight = this.root.append('g').attr('id', 'weight');
         this.structure = this.root.append('g').attr('id', 'structure');
-        this.contour = this.root.append('g').attr('id', 'contour');
 
         this.ccdId = data.ccd_id;
         this.resolution = new Vector2D(data.resolution.x, data.resolution.y);
@@ -53,7 +50,9 @@ class Depiction {
             }
 
             this.bonds.push(bond);
+
         });
+
     }
 
 
@@ -62,10 +61,10 @@ class Depiction {
      * atom.
      *
      * Present implementation sorts all the partners based on the atom
-     * degree and then gets the one with the lovest degree and places
+     * degree and then gets the one with the lowest degree and places
      * the initial residue position along the vector pointing from it.
      *
-     * @param {string[]} atomNames list of atom names the bound residue
+     * @param {string[]} atomNames array of atom names the bound residue
      * has a contact with.
      * @returns {Vector2D} Returns an initial placement of the residue in contact.
      * @memberof Depiction
@@ -89,6 +88,13 @@ class Depiction {
 
         return new Vector2D(x, y);
     }
+    
+    /**
+     * Draws ligand structure by appending svg:path
+     * elements corresponding to bonds and atoms with labels
+     * @param {boolean} true if atom names need to be displayed
+     * @memberof Depiction
+     */
 
     public draw(atomNames: boolean = false) {
         this.structure.selectAll("*").remove();
@@ -99,43 +105,184 @@ class Depiction {
         else this.appendLabels();
     }
 
+    /**
+     * Highlights atoms and bonds connecting them
+     * @param {string[]} atoms array of atom names to higlight
+     * @param {string} color color to be used for higlighting
+     * @memberof Depiction
+     */
     public highlightSubgraph(atoms: Array<string>, color: string = undefined) {
-        if (!this.atoms || !atoms) return;
-
+        if (!this.atoms) return;
         this.highlight.selectAll('*').remove();
+        if(atoms){
+            color = color ? color : "#FFFF00";
+            let atomsToHighlight = this.atoms.filter(x => atoms.includes(x.name));
 
-        color = color ? color : "#BFBFBF";
-        let atomsToHighlight = this.atoms.filter(x => atoms.includes(x.name));
+            this.highlight.selectAll()
+                .data(atomsToHighlight)
+                .enter()
+                .append('circle')
+                .attr('r', '16.12')
+                .attr('cx', x => x.position.x)
+                .attr('cy', x => x.position.y)
+                .attr('style', `fill:${color};fill-rule:evenodd;stroke:${color};stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1`);
 
-        this.highlight.selectAll()
-            .data(atomsToHighlight)
-            .enter()
-            .append('circle')
-            .attr('r', '16.12')
-            .attr('cx', x => x.position.x)
-            .attr('cy', x => x.position.y)
-            .attr('style', `fill:${color};fill-rule:evenodd;stroke:${color};stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1`);
+            let bondsToHighlight = this.bonds.filter(x => atoms.includes(x.bgn.name) && atoms.includes(x.end.name))
 
-        let bondsToHighlight = this.bonds.filter(x => atoms.includes(x.bgn.name) && atoms.includes(x.end.name))
-
-        this.highlight.selectAll()
-            .data(bondsToHighlight)
-            .enter()
-            .append('path')
-            .attr('d', x => `M ${x.bgn.position.x},${x.bgn.position.y} ${x.end.position.x},${x.end.position.y}`)
-            .attr('style', `fill:none;fill-rule:evenodd;stroke:${color};stroke-width:22px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1`)
-    }
-
-    public addContour(data: any) {
-        this.contour.selectAll('*').remove();
-
-        this.contour.append('div').text(`'contour data goes here: ${data}`);
+            this.highlight.selectAll()
+                .data(bondsToHighlight)
+                .enter()
+                .append('path')
+                .attr('d', x => `M ${x.bgn.position.x},${x.bgn.position.y} ${x.end.position.x},${x.end.position.y}`)
+                .attr('style', `fill:none;fill-rule:evenodd;stroke:${color};stroke-width:22px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1`)
+        }
     }
 
     /**
-     * Appends to a given selection the visual representation of bonds as svg:path elements.
-     *
+     * Adds circles around atoms corresponding to the value of 
+     * their weights.The size and color of circles around 
+     * atom indicates the strength of weight.
+     * @param {any} weights objects with atom names and value of weight
+     * @memberof Depiction
+     */
+
+    public addCircles(weights: any): void {
+        this.atoms.forEach(x => {
+            /** 
+             * This has been changed so we can highlight every Atom
+             */
+            let valueTo = weights.filter(y => y.atom == x.name).map(z => z.value)[0];
+            if (valueTo === undefined) valueTo = 0.00;
+            x.value = valueTo;
+        });
+
+        const data = this.atoms;
+
+        const scales = this.getScale();
+        this.weight.selectAll("*").remove();
+        /**
+         * Here is your original weight drawing function
+         */
+        // this.weight.selectAll()
+        //     .data(data)
+        //     .enter()
+        //     .each(function(x: any){
+        //         if(x.value >= q1){
+        //             d3.select(this)
+        //             .append('circle')
+        //                 .attr('cx', x.position.x)
+        //                 .attr('cy', x.position.y)
+        //                 .attr('r', secondScale.radiusScale(x.value))
+        //                 .attr('fill', secondScale.colorScale(x.value))
+        //                 .attr("fill-opacity", "0.5")
+        //             if(x.value >= q3){
+        //                 d3.select(this)
+        //                 .append('circle')
+        //                     .attr('cx', x.position.x)
+        //                     .attr('cy', x.position.y)
+        //                     .attr('r', thirdScale.radiusScale(x.value))
+        //                     .attr('fill', thirdScale.colorScale(x.value))
+        //                     .attr("fill-opacity", "0.5")
+        //             }
+        //         }
+        //     });
+
+        /**
+         * Here is your original second weight drawing function
+         */
+        this.weight.selectAll()
+            .data(data)
+            .enter()
+            .append('circle')
+                .attr("class", x => `${x.name}_Circles`)
+                .attr("cx", x => x.position.x)
+                .attr("cy", x => x.position.y)
+                /**
+                 * set a custom value of radius for values of zero
+                 * to be able to highlight them 
+                 */
+                .attr("r", x => x.value > 0 ? scales.radiusScale(x.value): 15) 
+                .attr("fill", x=> x.value > 0 ? scales.colorScale(x.value): '#ffffff')
+                /**
+                 * Since this is drawn below "structure" I've noticed fill-opacity
+                 * does not change anything actually
+                 */
+                .attr("fill-opacity", "1")
+                /**
+                 * This is a fill-opacity function if we want to draw "weight"
+                 * on top of "structure"
+                 */
+                // .attr("fill-opacity", (x:Atom) => {
+                //     if (x.value+"" === "0.00") return 0.0;
+                //     return "0.8";
+                // })
+                .on('mouseenter', (x:Atom, i:number, g:any) => {
+                    this.atomMouseEnterEventHandler(x, g[i], false);
+                })
+                .on('mouseleave', (_x:Atom, _i:number, _g:any) => {
+                    this.atomMouseLeaveEventHandler(false);
+                });     
+            
+            /**
+             * This is code I tested in the case we drawn "weight"
+             * on top of "structure"
+             */
+            // this.hideStructureLabels();
+            // this.weight
+            //     .selectAll()
+            //     .data(data)
+            //     .enter()
+            //     .append('g')
+            //     .attr('filter', 'labels')
+            //     .each(function (x: Atom) {
+            //         if (x.labels.length > 0) {
+            //             for (var i = 0; i < x.labels.length; i++) {
+            //                 d3.select(this)
+            //                     .append('path')
+            //                     .attr('d', x.labels[i].d)
+            //                     .style("background-color", "white")
+            //                     .attr('fill', x.labels[i].fill)
+            //             }
+            //         }
+            //     });   
+    }
+
+    /**
+     * Generate scale of values for the radius and color
+     * of circles representing the weight of atoms
+     * @private
+     * @memberof Depiction
+     */
+    private getScale() {
+        /**
+         * scales for radius are generated for only non-zero values.
+         * keeping zero as the minimum value of domain will generate
+         * very small radius which cannot be highlighted, alternatively
+         * if the minimum value of range is increased, then maximum value 
+         * of the range also need to be increased which will result in very
+         * large circles for high values 
+        */
+        const weights = this.atoms.map(x => x.value).filter(x => x > 0)
+        const weightMax = d3.max(weights);
+        const weightMin = d3.min(weights);
+        const radiusScale = d3.scaleSqrt([weightMin, weightMax], [10,30]);
+        const colorScale = d3.scaleLinear(
+            [0, 0.01, weightMax],
+            ["#f0fcf0","#a0bb9e","#505d50"]
+        );
+        return {
+            "radiusScale": radiusScale,
+            "colorScale": colorScale
+        }
+
+        
+    }
+
+    /**
+     * Appends to a given selection the visual representation of 
+     * bonds as svg:path elements.
      * representation of the bond visuals.
+     * @private
      * @memberof Depiction
      */
     private appendBondVisuals(): void {
@@ -149,7 +296,7 @@ class Depiction {
 
     /**
      * Append atom name labels to the visualization.
-     *
+     * @private
      * @memberof Depiction
      */
     private appendAtomNames() {
@@ -167,12 +314,8 @@ class Depiction {
     }
 
     /**
-     * Append depiction labels to the visualization. Because RDKIt places
-     * the labels slightly differently this information needs to be
-     * consumed too, because we cannot use just atom position directly.
-     * Also there are all sorts of colorful subscripts and superscripts,
-     * so it is much easier to use it this way.
-     *
+     * Append depiction labels to the visualization.
+     * @private
      * @memberof Depiction
      */
     private appendLabels() {
@@ -183,7 +326,8 @@ class Depiction {
             .data(data)
             .enter()
             .append('g')
-            .attr('filter', 'url(#solid-background)')
+            .attr('class', 'structureLabels')
+            .attr('filter', 'labels')
             .each(function (x: any) {
                 for (var i = 0; i < x.labels.length; i++) {
                     d3.select(this)
@@ -196,6 +340,21 @@ class Depiction {
             });
     }
 
+    // /**
+    //  * Remove depiction structure labels
+    //  * @private
+    //  * @memberof Depiction
+    //  */
+    // private hideStructureLabels() {
+    //     d3.selectAll('.structureLabels').remove();
+    // }
+
+    /**
+     * Finds the center of an array of atoms
+     * @param {string} ids atom ids 
+     * @return {Vector2D} coordinates of center
+     * @memeberof Depiction
+     */
     public getCenter(ids: string[]): Vector2D {
         let coords = new Array<Vector2D>();
 
@@ -214,7 +373,6 @@ class Depiction {
      *
      *
      * @param {Map<string, number>} map
-     * @returns
      * @memberof Depiction
      */
     public sortMap(map: Map<string, number>) {
@@ -232,6 +390,139 @@ class Depiction {
 
         return newMap;
     }
+
+    /**
+     * Highlights an atom by transitioning the 
+     * radius of circles around atoms and increasing
+     * the stroke width changing the colour
+     */
+    private highlightAtom(element) {
+        this.removeHighlights();
+        const scales = this.getScale()
+        
+        const selectedCircle = d3.select(element)
+            .classed("selectedCircle", true)
+            .style("stroke", "#FBBD1D")
+            .style("stroke-width", 5);
+
+
+        function animateStroke() {
+            if (selectedCircle.classed("selectedCircle")) {
+                selectedCircle.transition()
+                    .duration(500) // 500 milliseconds
+                    .style("stroke-width", 10)
+                    .attr("r", () => {
+                        const d = selectedCircle.datum() as Atom; // Access bound data
+                        if(d.value > 0){
+                            return scales.radiusScale(d.value)* 1.5; // Increase size
+                        }
+                        return 30
+                        
+                    })
+                    .transition()
+                    .duration(500) // 500 milliseconds
+                    .style("stroke-width", 5)
+                    .attr("r", () => {
+                        const d = selectedCircle.datum() as Atom;
+                        if(d.value > 0){
+                            return scales.radiusScale(d.value); // Revert to original size
+                        }
+                        return 15
+                    })
+                    .on("end", animateStroke) // Loop animation
+        }
+        }
+        animateStroke();
+    }
+
+    /**
+     * Removes the highlights of the atom on 
+     * mouse leaving
+     */
+    private removeHighlights(){
+        const scales = this.getScale();
+        const selectedCircle = d3.selectAll(".selectedCircle");        
+        selectedCircle.classed("selectedCircle", false)
+            .interrupt()
+            .attr("r", () => {
+                const d = selectedCircle.datum() as Atom;
+                if(d.value > 0){
+                    return scales.radiusScale(d.value); // Revert to original size
+                }
+                return 15
+            })
+            .style("stroke", null);
+    }
+
+    // #region event handlers
+    /**
+     * Mouse enter event handler for circles around atoms
+     * depicting their weights
+     * @public
+     * @param {Atom} atom object
+     * @param {boolean} propagation if event should be triggered on external components
+     * @memebrof Depiction
+     */
+
+    public atomMouseEnterEventHandler(x: Atom, element: any, propagation:boolean){
+        this.highlightAtom(element);
+        this.fireExternalAtomEvent(x, propagation, Config.LigandShowAtomEvent);
+    }
+
+    /**
+     * Mouse leave event handler for circles around atoms
+     * depicting their weights
+     * @public
+     * @param {boolean} propagation if event should be triggered on external components
+     * @memberof Depiction
+     */
+    public atomMouseLeaveEventHandler(propagation:boolean){
+        this.removeHighlights();
+        this.fireExternalNullEvent(propagation, Config.LigandHideAtomEvent);
+    }
+    // #endregion
+
+    // #region fire events
+    /**
+     * Dispatches custom event to display atom names and
+     * corresponding weights on tooltip on mouse enter
+     * @private
+     * @param {Atom} atom object
+     * @param {string} eventName name of event
+     * @memeberof Depiction
+     */
+    private fireExternalAtomEvent(atom: Atom, propagation:boolean, eventName: string){
+        const e = new CustomEvent(eventName, {
+            bubbles: true,
+            detail: {
+                tooltip: atom.toTooltip("%"),
+                atomName: atom.name,
+                external: propagation
+            }
+        });
+        this.parent.dispatchEvent(e);
+    }
+
+    /**
+     * Dispatches event to hide tooltip on mouse leave
+     * @private
+     * @param {boolean} propagation if event should be triggered on external components
+     * @param {string} eventName name of event
+     * @memeberof Depiction 
+     */
+    private fireExternalNullEvent(propagation:boolean, eventName: string) {
+        const e = new CustomEvent(eventName, {
+            bubbles: true,
+            detail: {
+                external: propagation
+            }
+        });
+
+        this.parent.dispatchEvent(e);
+    }
+
+    // #endregion
+
 }
 
 
@@ -247,26 +538,36 @@ class Atom {
     name: string;
     labels: any;
     position: Vector2D;
-    connectivity: number
+    connectivity: number;
+    value: number;
 
     constructor(item: any) {
         this.name = item.name;
         this.labels = item.labels;
         this.position = new Vector2D(item.x, item.y);
         this.connectivity = 0;
+        this.value = 0;
     }
 
     /**
      *
      *
      * @param {Atom} other
-     * @returns true if the atoms are equal
+     * @returns {boolean} true if the atoms are equal
      * @memberof Atom
      */
-    public equals(other: Atom) {
+    public equals(other: Atom): boolean {
         if (!(other instanceof Atom)) return false;
 
         return other.name === this.name;
+    }
+
+    /**
+     * @return {string} name of atom
+     * @memberof Atom
+     */
+    public toTooltip(symbol: string): string {
+        return `<span>${this.name}: ${this.value.toFixed(2)}${symbol}</span>`;
     }
 }
 
@@ -340,7 +641,6 @@ class Vector2D {
     }
 }
 
-
 /**
  * Represents a bond in a 2D depiction.
  *
@@ -356,12 +656,6 @@ class Bond {
     coords: string;
     style: string;
 
-    /**
-     *Creates an instance of the bond.
-     * @param {Atom} a
-     * @param {Atom} b
-     * @memberof Bond
-     */
     constructor(a: Atom, b: Atom, coords: string, style: string) {
         this.bgn = a;
         this.end = b;
@@ -389,7 +683,7 @@ class Bond {
      * Check whether or not a bond contains the atom.
      *
      * @param {Atom} other The other side of the bond
-     * @returns True if the atom is a part of the bond, false otherwise.
+     * @returns {boolean} True if the atom is a part of the bond, false otherwise.
      * @memberof Bond
      */
     public containsAtom(other: Atom) {

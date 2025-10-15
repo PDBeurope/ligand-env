@@ -114,6 +114,9 @@ let helpBonds = `
 
 // #endregion help
 
+/**
+ * @class UI
+ */
 
 
 class UI {
@@ -143,7 +146,6 @@ class UI {
      *
      * @param {Config.UIParameters} p Object with annotation which
      * UI elements should be created.
-     * @returns
      * @memberof UI
      */
     public register(p: Config.UIParameters) {
@@ -263,6 +265,8 @@ class UI {
             this.parent.addEventListener(Config.interactionClickEvent, e => this.nodeMouseEnterEventHandler(e));
             this.parent.addEventListener(Config.interactionMouseoverEvent, e => this.nodeMouseEnterEventHandler(e));
             this.parent.addEventListener(Config.interactionMouseoutEvent, () => this.nodeMouseLeaveEventHandler());
+            this.parent.addEventListener(Config.LigandShowAtomEvent, e => this.nodeMouseEnterEventHandler(e));
+            this.parent.addEventListener(Config.LigandHideAtomEvent, () => this.nodeMouseLeaveEventHandler());
         }
 
         if (this.residueLabel !== undefined) {

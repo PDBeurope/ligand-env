@@ -1,3 +1,9 @@
+## RELEASE 2.0 - 6 December 2024
+
+
+* Created aggregated interactions view
+* Code documentation improved
+
 ## RELEASE 1.0 - 28 April 2021
 
 

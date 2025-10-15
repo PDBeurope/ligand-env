@@ -3,6 +3,14 @@ import { LitElement } from 'lit-element';
 import "../styles/pdb-ligand-env.css";
 
 // Extend the LitElement base class
+/**
+ * PDB LigandEnv component to display ligand structure in 2D along with its interactions. 
+ * This depiction can be enriched with substructure highlight, atom names, binding site 
+ * interactions and aggregated protein-ligand interactions
+ * @component 
+ * @example <caption> Basic usage </caption>
+ * <pdb-ligand-env pdb-id="1cbs" pdb-res-id="200" pdb-chain-id="A" environment="development"></pdb-ligand-env>
+ */
 class pdbLigandEnv extends LitElement {
 
   //Get properties / attribute values
@@ -13,20 +21,40 @@ class pdbLigandEnv extends LitElement {
       entityId: { type: String, attribute: 'entity-id' },
       resName: { type: String, attribute: 'pdb-res-name' },
       resId: { type: Number, attribute: 'pdb-res-id' },
+      contactType: {type: Array, attribute: 'contact-type', noAccessors: true},
       chainId: { type: String, attribute: 'pdb-chain-id' },
       substructureHighlight: { type: Array, attribute: 'substructure' },
       substructureColor: { type: String, attribute: 'color' },
       zoomOn: { type: Boolean, attribute: 'zoom-on' },
       namesOn: { type: Boolean, attribute: 'names-on' },
+      depictionOnly: {type: Boolean, attribute: 'depiction-only'},
       env: { type: String, attribute: 'environment' },
     };
   }
+
+  // Create custom accessors for contactType
+  set contactType(value) {
+    let prevCType = this._contactType + "";
+    this._contactType = value;
+    if (prevCType.length > 0) {
+      if(this.display){
+        this.display.showWeights(value)
+      }
+    }
+  } 
+  get contactType() { return this._contactType; }
 
   constructor() {
     super();
   }
 
   async connectedCallback() {
+    this.renderLigandEnv();
+  }
+
+  renderLigandEnv() {
+    this.innerHTML = "";
+
     this.highlightSubstructure = [];
     let uiParams = new Config.UIParameters();
     uiParams.zoom = this.zoomOn;
@@ -35,7 +63,14 @@ class pdbLigandEnv extends LitElement {
     let env = this.env === undefined ? "production" : this.env;
     let names = this.namesOn === undefined ? false : this.namesOn;
 
-    this.display = new Visualization(this, uiParams, env);
+
+    if(this.depictionOnly){
+      this.display = new Visualization(this, uiParams, env, true)
+    }
+    else{
+      this.display = new Visualization(this, uiParams, env, false);
+    }
+    
     if (this.pdbId) {
       if (this.entityId) {
         this.display.initCarbohydratePolymerInteractions(this.pdbId, this.bmId, this.entityId);
@@ -47,11 +82,21 @@ class pdbLigandEnv extends LitElement {
         this.display.initLigandInteractions(this.pdbId, this.resId, this.chainId);
       }
     }
-    else if (this.resName) {
-      this.display.initLigandDisplay(this.resName, names).then(() => this.display.centerScene());
+    else if (this.resName){
+      this.display.initLigandDisplay(this.resName, names).then(() => {
+        if (this.contactType){
+          if(this.display.ligandIntxData === undefined){
+            this.display.initLigandWeights(this.resName).then(() => {
+              this.display.showWeights(this.contactType);
+            })
+          }
+          else {
+            this.display.showWeights(this.contactType);
+          }
+        }
+      })
     }
   }
-
 
   //#region properties
   set depiction(data) {
@@ -61,31 +106,39 @@ class pdbLigandEnv extends LitElement {
     this.display.centerScene();
   }
 
-  set highlightSubstructure(data) {
-    if (!data || !this.display) {
-      console.log(`Argument needs to be a non empty array of strings.`);
+  set interaction(IntxData) {
+    if(!IntxData || !this.display) return;
+    this.display.ligandIntxData = IntxData;
+  }
+
+  // set atomWeights(contactType) {
+  //   if (!contactType || !this.display.ligandIntxData){
+  //     return;
+  //   }
+  //   this.display.showWeights(contactType);
+  // }
+
+  set highlightSubstructure(substructure) {
+    if (!this.display) {
       return;
     }
-
-    this.display.addLigandHighlight(data, this.highlightColor);
-    this.substructureHighlight = data;
+    this.substructureHighlight = substructure;
+    this.display.addLigandHighlight(this.substructureHighlight);
+    
   }
 
   set highlightColor(data) {
-    if (!data || !this.display) return;
+    if (!data || !this.display || !this.substructureHighlight) return;
 
     this.highlightColor = data;
     this.display.addLigandHighlight(this.substructureHighlight, this.highlightColor);
   }
 
-  set contourData(data) {
-    if (!data || !this.display || !this.display.depiction !== undefined) return;
-
-    this.display.addContours(data);
-  }
-
   set zoom(data) {
-    if (this.display !== undefined) this.display.toggleZoom(data);
+    if (!this.display){
+      return
+    }
+    this.display.toggleZoom(data);
   }
 
   set atomNames(data) {

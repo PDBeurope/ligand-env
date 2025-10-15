@@ -9,6 +9,7 @@ namespace Resources {
     export const compoundSummaryURL: string = 'api/pdb/compound/summary';
     export const componentLibraryURL: string = 'pdb-component-library/data/ligand-env';
     export const staticFilesURL: string = 'static/files/pdbechem_v2';
+    export const interactionURL: string = 'aggregated-api/compound/interaction';
 
     export function glycanSymbolsAPI(env: Model.Environment) {
         let url = '';
@@ -128,7 +129,6 @@ namespace Resources {
      * @param {string} chainId
      * @param {number} resId
      * @param {Model.Environment} env
-     * @returns
      */
     export function ligandInteractionsAPI(pdbId: string, chainId: string, resId: number, env: Model.Environment) {
         let url = '';
@@ -172,6 +172,25 @@ namespace Resources {
                 url = `${productionAPI}/${compoundSummaryURL}/${chemCompId}`;
                 break;
         }
+        return url;
+    }
+
+    export function interactionAPI(chemCompId: string, env: Model.Environment): string {
+        let url = '';
+        switch (env) {
+            case Model.Environment.Development: {
+                url = `${devAPI}/${interactionURL}/${chemCompId}`;
+                break;
+            }
+            case Model.Environment.Internal: {
+                url = `${intAPI}/${interactionURL}/${chemCompId}`;
+                break;
+            }
+            default:
+                url = `${productionAPI}/${interactionURL}/${chemCompId}`;
+                break;
+        }
+
         return url;
     }
 }

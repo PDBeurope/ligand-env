@@ -1,3 +1,13 @@
+/**
+ * This class contains methods for creating all the visualization
+ * components of the LigandEnv
+ *
+ * @class Visualization
+ * @param {HTMLElement} element HTMLElement to display the visualization
+ * @param {Config.UIParameters} uiParameters UI parameter configurations
+ * @param {string} env environment to fetch data from
+ * 
+ */
 class Visualization {
     // component related
     private parent: HTMLElement;
@@ -26,6 +36,7 @@ class Visualization {
 
     private visualsMapper: VisualsMapper;
     private interactionsData: any;
+    private ligandIntxData: Model.aggregatedInteractionData;
     private selectedResidueHash: string;
     private nodeDragged: boolean;
 
@@ -34,54 +45,55 @@ class Visualization {
     public fullScreen: boolean;
     // #endregion
 
-    constructor(element: HTMLElement, uiParameters: Config.UIParameters = undefined, env: string = "production") {
+    constructor(element: HTMLElement, uiParameters: Config.UIParameters = undefined, env: string = "production", depictionOnly: Boolean = false) {
         this.parent = element;
         this.environment = this.parseEnvironment(env);
         this.parent.style.cssText += "display: block; height: 100%; width: 100%; position: relative;";
-
-        this.visualsMapper = new VisualsMapper(this.environment);
-        this.rProvider = ResidueProvider.getInstance(this.environment);
-        this.bindingSites = new Array<Model.BindingSite>();
-
-        this.fullScreen = false;
-        this.nodeDragged = false;
-
-        if (uiParameters === undefined) uiParameters = new Config.UIParameters();
-
-        new UI(this.parent, this).register(uiParameters);
-
         this.svg = d3.select(this.parent)
-            .append('div')
-            .attr('id', 'pdb-lig-env-root')
-            .append('svg')
-            .style('background-color', 'white')
-            .attr('xmlns', 'http://www.w3.org/2000/svg')
-            .attr('width', '100%')
-            .attr('height', '100%');
-
+                        .append('div')
+                        .attr('id', 'pdb-lig-env-root')
+                        .append('svg')
+                        .style('background-color', 'white')
+                        .attr('xmlns', 'http://www.w3.org/2000/svg')
+                        .attr('width', '100%')
+                        .attr('height', '100%');
         this.addMarkers();
-
         this.canvas = this.svg.append('g').attr('id', 'vis-root');
-        this.linksRoot = this.canvas.append('g').attr('id', 'links');
         this.depictionRoot = this.canvas.append('g').attr('id', 'depiction');
-        this.nodesRoot = this.canvas.append('g').attr('id', 'nodes');
-
-        if (uiParameters.zoom) this.zoomHandler = this.getZoomHandler();
-
-        document.addEventListener(Config.molstarClickEvent, e => this.molstarClickEventHandler(e));
-        document.addEventListener(Config.molstarMouseoverEvent, e => this.molstarClickEventHandler(e));
-        document.addEventListener(Config.molstarMouseoutEvent, () => this.molstarMouseoutEventHandler());
-
         d3.select(this.parent).on('resize', () => this.resize());
-        this.addMarkers();
+
+        //the below properties are only needed if interactivity with the component is needed. 
+        if(!depictionOnly){
+            this.visualsMapper = new VisualsMapper(this.environment);
+            this.rProvider = ResidueProvider.getInstance(this.environment);
+            this.bindingSites = new Array<Model.BindingSite>();
+            this.fullScreen = false;
+            this.nodeDragged = false;
+            if (uiParameters === undefined) uiParameters = new Config.UIParameters();
+            new UI(this.parent, this).register(uiParameters);
+            this.linksRoot = this.canvas.append('g').attr('id', 'links');
+            this.nodesRoot = this.canvas.append('g').attr('id', 'nodes');
+            if (uiParameters.zoom) this.zoomHandler = this.getZoomHandler();
+
+            document.addEventListener(Config.ligandHeatmapMouseoverEvent, e => this.ligHeatmapMouseoverEventHandler(e));
+            document.addEventListener(Config.ligandHeatmapMouseoutEvent, e => this.ligHeatmapMouseoutEventHandler(e));
+    
+            document.addEventListener(Config.molstarClickEvent, e => this.molstarClickEventHandler(e));
+            document.addEventListener(Config.molstarMouseoverEvent, e => this.molstarClickEventHandler(e)); 
+            document.addEventListener(Config.molstarMouseoutEvent, () => this.molstarMouseoutEventHandler());
+
+        }
+    
+        // this.addMarkers();
     }
 
     // #region event handlers
     private getZoomHandler() {
         return d3.zoom()
             .scaleExtent([1 / 10, 10])
-            .on('zoom', () => this.canvas
-                .attr('transform', d3.event.transform));
+            .on('zoom', () => {
+                this.canvas.attr('transform', d3.event.transform)
+            });
     }
 
 
@@ -95,7 +107,7 @@ class Visualization {
     private molstarClickEventHandler(e: any) {
         if (this.fullScreen) return;
 
-        let hash = `${e.eventData.auth_asym_id}${e.eventData.auth_seq_id}${e.eventData.ins_code}`;
+    let hash = `${e.eventData.auth_asym_id}${e.eventData.auth_seq_id}${e.eventData.ins_code}`;
 
         this.nodes?.each((node: Model.InteractionNode, index: number, group: any) => {
             this.nodeDim(node, index, group);
@@ -107,6 +119,29 @@ class Visualization {
             }
         });
 
+    }
+
+    private ligHeatmapMouseoverEventHandler(e: any) {
+        if (this.depiction === undefined) return;
+        if (this.ligandIntxData === undefined) return;
+        const atomName = e.detail.name; // CustomEvent
+        const atom = this.depiction.atoms.filter(x => x.name === atomName);
+
+        const selection = d3.select(`.${atomName}_Circles`);
+        const nodes = selection.nodes();
+        const lastElement = nodes[nodes.length - 1];
+
+        if (atom.length > 0) {
+            this.depiction.atomMouseEnterEventHandler(atom[0], lastElement, true);
+        }
+        // else {
+        //     this.depiction.atomMouseLeaveEventHandler(false);
+        // }
+    }
+
+    private ligHeatmapMouseoutEventHandler(_e:any) {
+        if (this.depiction === undefined) return;
+        this.depiction.atomMouseLeaveEventHandler(true);
     }
 
 
@@ -260,7 +295,7 @@ class Visualization {
      * PDBeChem process.
      *
      * @param {string} ligandId
-     * @returns
+     * @param {boolean} withNames true for displaying atom names
      * @memberof Visualization
      */
     public async initLigandDisplay(ligandId: string, withNames: boolean = false) {
@@ -272,19 +307,50 @@ class Visualization {
             .then(() => this.centerScene());
     }
 
+    
+     /**
+     * Download aggregated protein-ligand interactions data.
+     *
+     * @param {string} ligandId
+     * @memberof Visualization
+     */   
+    
+    public async initLigandWeights(ligandId: string){
+        const weightUrl = Resources.interactionAPI(ligandId, this.environment);
+        return d3.json(weightUrl)
+            .then((d: any) => this.ligandIntxData = d[ligandId]);
+    }
+
 
     /**
      * Add depiction to the canvas from external resource.
      *
-     * @param {*} depiction Content of annotation.json file generated by
+     * @param {any} depiction Content of annotation.json file generated by
      * the PDBeChem process.
+     * @param {boolean} withNames true for displaying atom names
      * @memberof Visualization
      */
     public addDepiction(depiction: any, withNames: boolean) {
-        this.depiction = new Depiction(this.depictionRoot, depiction);
+        this.depiction = new Depiction(this.parent, this.depictionRoot, depiction);
         this.depiction.draw(withNames);
+
     }
 
+    /**
+     * Adds circles around atoms higlighting the weights of atoms.
+     *
+     * @param {string[]| string} contactType 
+     * @memberof Visualization
+     */
+    public showWeights(contactType: string[]){
+        if ((this.depiction === undefined) || (this.ligandIntxData) === undefined) return;
+        const atomPropensity= new Model.LigandIntx(this.ligandIntxData, contactType).getAtomIntxPropensity();
+
+        this.depiction.addCircles(atomPropensity);
+        if(this.zoomHandler !== undefined){
+            this.zoomHandler(this.svg, d3.zoomIdentity)
+        };
+    }
 
     /**
      * Show depiction with/without atom names
@@ -300,6 +366,7 @@ class Visualization {
 
     public toggleZoom(active: boolean) {
         this.zoomHandler = active ? this.getZoomHandler() : undefined;
+        this.zoomHandler(this.svg, d3.zoomIdentity);
     }
 
 
@@ -312,26 +379,16 @@ class Visualization {
      * @memberof Visualization
      */
     public addLigandHighlight(highlight: string[], color: string = undefined) {
+        if (!this.depiction) return;
         this.depiction.highlightSubgraph(highlight, color);
     }
-
-    /**
-     * Add contours to the ligand structure. The previous contours are
-     * going to be removed.
-     *
-     * @param {*} data
-     * @memberof Visualization
-     */
-    public addContours(data: any) {
-        this.depiction.addContour(data);
-    }
-
-
+    
     /**
      * Add ligand interactions to the canvas
      *
      * @param {*} data Data content of the API end point
      * /pdb/bound_ligand_interactions
+     * @param {boolean} true if atom names to be displayed
      * @memberof Visualization
      */
     public addLigandInteractions(data: any, withNames: boolean = false) {
@@ -356,7 +413,7 @@ class Visualization {
     /**
      * Add bound molecule interactions to the canvas.
      *
-     * @param {*} data Data content of the API end point
+     * @param {any} data Data content of the API end point
      * /pdb/bound_molecule_interactions
      * @param {string} bmId Bound molecule id
      * @memberof Visualization
@@ -376,6 +433,7 @@ class Visualization {
 
 
     // #region menu functions
+    
     /**
      * Export scene into an SVG components. It relies on the availability
      * of the external CSS for SVG styling. Otherwise it does not work.
@@ -472,43 +530,49 @@ class Visualization {
             this.computeBoundingBox(minX, maxX, minY, maxY);
 
         } else if (this.depiction !== undefined) {
-            let minX: any = d3.min(this.depiction.atoms.map((x: Atom) => x.position.x));
-            let minY: any = d3.min(this.depiction.atoms.map((x: Atom) => x.position.y));
+            let minX: any = d3.min(this.depiction.atoms.map((x: Atom) => x.labels.length==0 ? x.position.x : x.position.x - 50));
+            let minY: any = d3.min(this.depiction.atoms.map((x: Atom) => x.labels.length==0 ? x.position.y : x.position.y - 50));
 
-            let maxX: any = d3.max(this.depiction.atoms.map((x: Atom) => x.position.x));
-            let maxY: any = d3.max(this.depiction.atoms.map((x: Atom) => x.position.y));
+            let maxX: any = d3.max(this.depiction.atoms.map((x: Atom) => x.labels.length==0 ? x.position.x : x.position.x + 50));
+            let maxY: any = d3.max(this.depiction.atoms.map((x: Atom) => x.labels.length==0 ? x.position.y : x.position.y + 50));
 
             this.computeBoundingBox(minX, maxX, minY, maxY);
         }
     }
 
     private computeBoundingBox(minX: number, maxX: number, minY: number, maxY: number) {
-        // The width and the height of the graph
-        let molWidth = Math.max((maxX - minX), this.parent.offsetWidth);
-        let molHeight = Math.max((maxY - minY), this.parent.offsetHeight);
+        // Calculate the dimensions of the molecule
+        let molWidth = maxX - minX;
+        let molHeight = maxY - minY;
 
-        // how much larger the drawing area is than the width and the height
-        let widthRatio = this.parent.offsetWidth / molWidth;
-        let heightRatio = this.parent.offsetHeight / molHeight;
+        // Calculate the aspect ratios
+        let molAspectRatio = molWidth / molHeight;
+        let parentAspectRatio = this.parent.offsetWidth / this.parent.offsetHeight;
 
-        // we need to fit it in both directions, so we scale according to
-        // the direction in which we need to shrink the most
-        let minRatio = Math.min(widthRatio, heightRatio) * 0.85;
+        // Calculate scaling factor to fit the molecule within the parent dimensions
+        let scale;
+        if (molAspectRatio > parentAspectRatio) {
+        // Molecule is wider than the parent
+        scale = this.parent.offsetWidth / molWidth;
+        } else {
+        // Molecule is taller than the parent
+        scale = this.parent.offsetHeight / molHeight;
+        }
 
-        // the new dimensions of the molecule
-        let newMolWidth = molWidth * minRatio;
-        let newMolHeight = molHeight * minRatio;
+        // Apply a margin (optional)
+        scale *= 0.85;
 
-        // translate so that it's in the center of the window
-        let xTrans = -(minX) * minRatio + (this.parent.offsetWidth - newMolWidth) / 2;
-        let yTrans = -(minY) * minRatio + (this.parent.offsetHeight - newMolHeight) / 2;
+        // Calculate new dimensions after scaling
+        let newMolWidth = molWidth * scale;
+        let newMolHeight = molHeight * scale;
 
-        // do the actual moving
-        this.canvas.attr('transform', `translate(${xTrans}, ${yTrans}) scale(${minRatio})`);
+        // Calculate translation to center the molecule
+        let xTrans = -minX * scale + (this.parent.offsetWidth - newMolWidth) / 2;
+        let yTrans = -minY * scale + (this.parent.offsetHeight - newMolHeight) / 2;
 
-        // tell the zoomer what we did so that next we zoom, it uses the
-        // transformation we entered here
-        let translation = d3.zoomIdentity.translate(xTrans, yTrans).scale(minRatio);
+        // Apply the transformation
+        this.canvas.attr('transform', `translate(${xTrans}, ${yTrans}) scale(${scale})`);
+        let translation = d3.zoomIdentity.translate(xTrans, yTrans).scale(scale);
         this.zoomHandler?.transform(this.svg, translation);
     }
 
@@ -611,6 +675,7 @@ class Visualization {
 
         this.parent.dispatchEvent(e);
     }
+        
 
     // #endregion fire events
 
@@ -668,7 +733,6 @@ class Visualization {
      * @param {Model.InteractionNode} n Interaction node user clicked to
      * @param {number} i index o the interaction node
      * @param {*} g group of interaction nodes
-     * @returns
      * @memberof Visualization
      */
     private selectLigand(n: Model.InteractionNode, i: number, g: any) {
@@ -783,7 +847,7 @@ class Visualization {
 
     /**
      * Setup display of interactions for bound molecule.
-     * * This includes: setup of links, nodes, simulation and subscribing to relevant events.
+     * This includes: setup of links, nodes, simulation and subscribing to relevant events.
      * No depiction is required for this step.
      *
      * @private

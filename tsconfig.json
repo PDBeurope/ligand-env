@@ -10,7 +10,7 @@
         "declaration": true,
         "module": "none",
         "moduleResolution": "node",
-        "out": "build/pdb-ligand-env-plugin.js"
+        "outFile": "build/pdb-ligand-env-plugin.js"
     },
     "include": ["src/plugin/**/*", ],
     "exclude": [

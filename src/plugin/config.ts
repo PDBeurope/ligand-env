@@ -7,9 +7,15 @@ namespace Config {
     export const interactionShowLabelEvent: string = 'PDB.interactions.showLabel';
     export const interactionHideLabelEvent: string = 'PDB.interactions.hideLabel';
 
+    export const LigandShowAtomEvent: string = 'PDB.ligand.showAtom';
+    export const LigandHideAtomEvent: string = 'PDB.ligand.hideAtom';
+
     export const molstarClickEvent: string = 'PDB.molstar.click';
     export const molstarMouseoverEvent: string = 'PDB.molstar.mouseover';
     export const molstarMouseoutEvent: string = 'PDB.molstar.mouseout';
+
+    export const ligandHeatmapMouseoverEvent: string = 'PDB.ligHeatmap.mouseover';
+    export const ligandHeatmapMouseoutEvent: string = 'PDB.ligHeatmap.mouseout';
 
     export const aaTypes = new Map<string, Array<string>>([
         ['hydrophobic', new Array<string>('A', 'I', 'L', 'M', 'F', 'W', 'V')],

@@ -45,7 +45,7 @@ class ResidueProvider {
      * Get single letter abbreviation of the ligand.
      *
      * @param {string} name Name of the chemical compound
-     * @returns Single letter abbreviation of the ligand
+     * @returns {string} Single letter abbreviation of the ligand
      * @memberof ResidueProvider
      */
     public getAminoAcidAbbreviation(name: string): string {
@@ -57,7 +57,6 @@ class ResidueProvider {
      * Fetch single letter abbreviations from API if they are not present
      *
      * @param {string} n
-     * @returns
      * @memberof ResidueProvider
      */
     public downloadAnnotation(r: Model.Residue): void {
