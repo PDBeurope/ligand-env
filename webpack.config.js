@@ -37,7 +37,7 @@ const config = {
       },
       {
         test: /.(jpg|jpeg|png|svg)$/,
-        use: ['url-loader'],
+        type: "asset/resource"
       },
       {
         test: /\.(js)$/,
