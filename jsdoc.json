@@ -3,13 +3,17 @@
     "allowUnknownTags": true
   },
   "opts": {
-    "template": "node_modules/better-docs",
     "destination": "build/docs"
   },
   "plugins": [
-    "node_modules/better-docs/typescript",
+    "node_modules/jsdoc-babel",
     "plugins/markdown"
   ],
+  "babel": {
+    "extensions": ["js", "ts"],
+    "presets": ["@babel/preset-typescript"],
+    "babelrc": false
+  },
   "source": {
     "includePattern": "\\.(jsx|js|ts|tsx)$",
     "include": ["README.md", "src/component", "src/plugin"]
